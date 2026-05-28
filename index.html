@@ -13,6 +13,7 @@ html{scroll-behavior:smooth;}
 body{background:var(--paper);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;line-height:1.7;min-height:100vh;overflow-x:hidden;}
 nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--paper);border-bottom:0.5px solid var(--ink-faint);padding:0 max(2rem, calc((100vw - 1280px) / 2 + 2rem));display:flex;align-items:center;justify-content:space-between;height:52px;}
 .nav-logo{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;letter-spacing:0.08em;color:var(--ink);text-decoration:none;cursor:pointer;}
+.logo-l1::after{content:'\00a0';}.logo-l1,.logo-l2{display:inline;}
 .nav-chips{display:flex;gap:6px;}
 .nav-chip{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;border:0.5px solid var(--ink-faint);background:transparent;color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:background 0.2s,border-color 0.2s,color 0.2s;font-family:'Jost',sans-serif;font-weight:300;}
 .nav-chip:hover{border-color:var(--ink-soft);color:var(--ink);}
@@ -135,7 +136,12 @@ footer{border-top:0.5px solid var(--ink-faint);padding:2rem;text-align:center;fo
 }
 @media(max-width:600px){
   .century-block{grid-template-columns:1fr;gap:0.6rem 0;}.century-era-name{font-size:15px;}.century-mark{padding-bottom:0;}
-  nav{padding:0 1rem;}.nav-chips{display:none;}
+  nav{padding:0 1rem;height:62px;}
+  .nav-chips{display:flex;gap:4px;}
+  .nav-chip{padding:4px 10px;font-size:9px;}
+  .logo-l1,.logo-l2{display:block;line-height:1.2;}
+  .logo-l1::after{content:'';}
+  .nav-logo{font-size:14px;text-align:right;}
   .timeline-section{padding:0 1rem 4rem;}.hero{padding:100px 1.2rem 60px;}
   .panel-disc-row{grid-template-columns:1fr;gap:1px;}
   .sp-inner{padding:72px 1.2rem 4rem;}
@@ -153,7 +159,7 @@ footer{border-top:0.5px solid var(--ink-faint);padding:2rem;text-align:center;fo
     <a class="nav-chip" href="#timeline" onclick="switchView('artists',this)">Художники</a>
     <a class="nav-chip" href="#">Произведения</a>
   </div>
-  <a class="nav-logo" onclick="goList()">Art Historica</a>
+  <a class="nav-logo" onclick="goList()"><span class="logo-l1">Art</span><span class="logo-l2">Historica</span></a>
 </nav>
 
 <div id="page-list">
