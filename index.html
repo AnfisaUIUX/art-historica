@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>История искусства — периоды и стили</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--ink:#1a1714;--ink-mid:#4a4540;--ink-soft:#8a8078;--ink-faint:#ccc5bc;--paper:#f7f4ef;--paper-warm:#ede8e0;--accent:#8b6f47;--accent-light:#c4a882;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;line-height:1.7;min-height:100vh;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--paper);border-bottom:0.5px solid var(--ink-faint);padding:0 max(2rem, calc((100vw - 1280px) / 2 + 2rem));display:flex;align-items:center;justify-content:space-between;height:52px;}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;letter-spacing:0.08em;color:var(--ink);text-decoration:none;cursor:pointer;}
+.nav-chips{display:flex;gap:6px;}
+.nav-chip{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;border:0.5px solid var(--ink-faint);background:transparent;color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:background 0.2s,border-color 0.2s,color 0.2s;font-family:'Jost',sans-serif;font-weight:300;}
+.nav-chip:hover{border-color:var(--ink-soft);color:var(--ink);}
+.nav-chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.nav-back{display:none;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;transition:color 0.2s;border:none;background:none;padding:0;font-family:'Jost',sans-serif;}
+.nav-back:hover{color:var(--ink);}
+#page-list{transition:transform 0.4s cubic-bezier(.4,0,.2,1),opacity 0.35s ease;}
+#page-style{position:fixed;inset:0;background:var(--paper);overflow-y:auto;z-index:150;transform:translateX(100%);opacity:0;transition:transform 0.4s cubic-bezier(.4,0,.2,1),opacity 0.35s ease;}
+#page-style.open{transform:translateX(0);opacity:1;}
+#page-list.pushed{transform:translateX(-5%);opacity:0.35;pointer-events:none;}
+.hero{padding:140px 2rem 80px;max-width:800px;margin:0 auto;text-align:center;}
+.hero-eyebrow{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,8vw,80px);font-weight:300;line-height:1.1;color:var(--ink);margin-bottom:1.5rem;}
+.hero h1 em{font-style:italic;}
+.hero-sub{font-size:15px;color:var(--ink-soft);max-width:480px;margin:0 auto;}
+.ornament{text-align:center;padding:2rem 0;color:var(--ink-faint);font-size:18px;letter-spacing:0.5em;}
+.timeline-section{max-width:1280px;margin:0 auto;padding:0 2rem 6rem;}
+.century-block{display:grid;grid-template-columns:170px 1fr;gap:0 2rem;padding:2rem 0;border-top:0.5px solid var(--ink-faint);opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.century-block.visible{opacity:1;transform:translateY(0);}
+.century-mark{padding-top:4px;}
+.century-era-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--ink);letter-spacing:0.02em;line-height:1.25;margin-bottom:5px;}
+.century-numeral{font-size:12px;color:var(--accent);letter-spacing:0.05em;line-height:1.5;}
+.century-years{color:var(--ink-soft);font-size:11px;letter-spacing:0.02em;}
+.style-chip-row{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
+.style-chip{font-family:'Jost',sans-serif;font-size:13px;font-weight:300;padding:6px 16px;border-radius:20px;border:0.5px solid var(--ink-faint);background:var(--paper-warm);color:var(--ink-mid);cursor:pointer;transition:background 0.2s,border-color 0.2s,color 0.2s;user-select:none;}
+.style-chip:hover{border-color:var(--accent-light);color:var(--ink);}
+.style-chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.style-panel{max-height:0;overflow:hidden;transition:max-height 0.5s ease,opacity 0.35s ease,margin 0.3s ease;opacity:0;margin-top:0;}
+.style-panel.open{max-height:700px;opacity:1;margin-top:12px;}
+.style-panel-inner{background:var(--paper-warm);border:0.5px solid var(--ink-faint);border-radius:14px;padding:1.4rem 1.6rem 1.2rem;margin-bottom:6px;}
+.panel-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--ink);margin-bottom:3px;}
+.panel-tag{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:8px;}
+.panel-desc-short{font-size:14px;line-height:1.8;color:var(--ink-mid);margin-bottom:1rem;}
+.panel-disciplines{border-top:0.5px solid var(--ink-faint);padding-top:1rem;display:flex;flex-direction:column;gap:0;}
+.panel-disc{border-bottom:0.5px solid var(--ink-faint);padding:0.7rem 0;}
+.panel-disc:last-child{border-bottom:none;padding-bottom:0;}
+.panel-disc-title{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;}
+.panel-disc-row{display:grid;grid-template-columns:110px 1fr;gap:0 1rem;align-items:baseline;margin-bottom:3px;}
+.panel-disc-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-soft);}
+.panel-disc-val{font-size:13px;color:var(--ink-mid);line-height:1.5;}
+.panel-disc-val em{font-style:italic;color:var(--ink);}
+.btn-more{display:inline-flex;align-items:center;gap:6px;margin-top:1rem;padding:7px 18px;border-radius:20px;border:0.5px solid var(--ink);background:transparent;color:var(--ink);font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s,color 0.2s;}
+.btn-more:hover{background:var(--ink);color:var(--paper);}
+.btn-more svg{width:12px;height:12px;transition:transform 0.2s;}
+
+/* STYLE PAGE — desktop two-column, mobile single */
+.sp-inner{max-width:1280px;margin:0 auto;padding:80px 2rem 5rem;}
+.sp-layout{display:grid;grid-template-columns:320px 1fr;gap:0 6rem;align-items:start;}
+.sp-left{position:sticky;top:68px;}
+.sp-header{padding-top:0.5rem;margin-bottom:0;}
+.sp-title-row{display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;}
+.sp-title{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,3.5vw,56px);font-weight:300;letter-spacing:0.02em;text-transform:uppercase;line-height:1.05;color:var(--ink);}
+.sp-dash{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,2.8vw,44px);color:var(--ink-faint);font-weight:300;line-height:1.2;padding-top:4px;}
+.sp-dates{font-size:12px;color:var(--ink-soft);letter-spacing:0.06em;margin-bottom:0.9rem;}
+.sp-dates strong{color:var(--accent);font-weight:400;}
+.sp-desc-wrap{font-size:13px;line-height:1.85;color:var(--ink-mid);}
+.sp-desc-text{overflow:hidden;transition:max-height 0.4s ease;}
+.sp-desc-text.collapsed{max-height:5em;-webkit-mask-image:linear-gradient(to bottom,black 40%,transparent 100%);mask-image:linear-gradient(to bottom,black 40%,transparent 100%);}
+.sp-desc-text.expanded{max-height:60em;-webkit-mask-image:none;mask-image:none;}
+.sp-expand-btn{background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;padding:4px 0 0;text-decoration:underline;text-underline-offset:2px;display:block;font-family:'Jost',sans-serif;}
+.sp-themes{margin:1.6rem 0 0;}
+.sp-themes-label{font-size:13px;font-weight:400;color:var(--ink);margin-bottom:0.6rem;}
+.sp-theme-chips{display:flex;flex-wrap:wrap;gap:6px 14px;}
+.sp-theme-chip{font-size:12px;color:var(--ink-soft);letter-spacing:0.02em;}
+/* right column */
+.sp-right{padding-top:0.5rem;}
+.sp-disc-section{margin-bottom:2.5rem;}
+.sp-disc-header{display:flex;align-items:baseline;gap:1.2rem;margin-bottom:0.8rem;padding-bottom:0.6rem;border-bottom:0.5px solid var(--ink-faint);}
+.sp-disc-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--ink);}
+.sp-disc-tabs{display:flex;gap:0.8rem;}
+.sp-disc-tab{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);cursor:pointer;padding:0 0 1px;background:none;border:none;border-bottom:1px solid transparent;transition:color 0.2s,border-color 0.2s;font-family:'Jost',sans-serif;}
+.sp-disc-tab.active{color:var(--ink);border-bottom-color:var(--ink);}
+/* horizontal scroll gallery */
+.sp-gallery{display:flex;gap:14px;overflow-x:auto;padding-bottom:14px;margin-top:0.8rem;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.sp-gallery::-webkit-scrollbar{display:none;}
+.sp-gallery-item{flex:0 0 calc((100% - 28px) / 3);display:flex;flex-direction:column;gap:7px;scroll-snap-align:start;}
+.sp-gallery-img{width:100%;height:240px;background:var(--paper-warm);border-radius:10px;border:0.5px solid var(--ink-faint);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sp-gallery-img svg{width:22px;height:22px;opacity:0.18;}
+.sp-gallery-caption{font-size:11px;color:var(--ink-mid);line-height:1.4;}
+.sp-gallery-caption strong{display:block;font-weight:400;color:var(--ink);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:13px;}
+/* authors list */
+.sp-list{margin-top:0.8rem;display:flex;flex-direction:column;}
+.sp-list-item{padding:0.65rem 0;border-bottom:0.5px solid var(--ink-faint);font-size:14px;color:var(--ink-mid);display:flex;align-items:baseline;gap:0.6rem;}
+.sp-list-item:last-child{border-bottom:none;}
+.sp-list-item::before{content:'—';color:var(--ink-faint);font-size:11px;flex-shrink:0;}
+/* mobile */
+@media(max-width:860px){
+  .sp-inner{padding:68px 1.4rem 4rem;}
+  .sp-layout{grid-template-columns:1fr;gap:0;}
+  .sp-left{position:static;margin-bottom:2rem;}
+  .sp-right{padding-top:0;}
+  .sp-gallery-item{flex:0 0 calc((100% - 14px) / 2);}
+  .sp-gallery-img{width:100%;height:190px;}
+}
+footer{border-top:0.5px solid var(--ink-faint);padding:2rem;text-align:center;font-size:11px;letter-spacing:0.1em;color:var(--ink-faint);text-transform:uppercase;}
+/* ── LIGHTBOX ── */
+#lb-overlay{position:fixed;inset:0;z-index:500;background:rgba(18,16,13,0.96);display:none;flex-direction:column;align-items:center;justify-content:center;padding:52px 56px 0;}
+#lb-overlay.open{display:flex;}
+#lb-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0;}
+#lb-img{max-width:100%;max-height:calc(100vh - 160px);object-fit:contain;border-radius:4px;opacity:1;transition:opacity 0.18s ease;}
+#lb-img.fade{opacity:0;}
+#lb-bar{width:100%;max-width:960px;display:flex;align-items:flex-end;justify-content:space-between;padding:1.2rem 0 1.6rem;gap:2rem;flex-shrink:0;}
+#lb-info{flex:1;min-width:0;}
+#lb-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;font-weight:400;color:#f7f4ef;display:block;margin-bottom:4px;line-height:1.25;}
+#lb-meta{font-size:12px;color:rgba(247,244,239,0.45);letter-spacing:0.05em;}
+#lb-count{font-size:11px;color:rgba(247,244,239,0.25);letter-spacing:0.1em;white-space:nowrap;padding-bottom:2px;}
+#lb-arrows{display:flex;gap:8px;flex-shrink:0;padding-bottom:2px;}
+.lb-btn{background:none;border:0.5px solid rgba(247,244,239,0.15);color:rgba(247,244,239,0.5);cursor:pointer;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;flex-shrink:0;}
+.lb-btn:hover{border-color:rgba(247,244,239,0.5);color:#f7f4ef;}
+.lb-btn:disabled{opacity:0.2;pointer-events:none;}
+#lb-close-btn{position:fixed;top:1rem;right:1.4rem;background:none;border:none;color:rgba(247,244,239,0.35);cursor:pointer;font-size:20px;line-height:1;padding:6px;transition:color 0.2s;z-index:510;}
+#lb-close-btn:hover{color:#f7f4ef;}
+.sp-gallery-img.has-img{cursor:zoom-in;}
+@media(max-width:600px){
+  #lb-overlay{padding:52px 16px 0;}
+  #lb-name{font-size:18px;}
+  #lb-bar{flex-wrap:wrap;gap:0.8rem;padding:1rem 0 1.2rem;}
+  #lb-count{width:100%;order:3;padding-bottom:0;}
+  #lb-arrows{order:2;}
+}
+@media(max-width:600px){
+  .century-block{grid-template-columns:110px 1fr;gap:0 1rem;}.century-era-name{font-size:15px;}
+  nav{padding:0 1rem;}.nav-chips{display:none;}
+  .timeline-section{padding:0 1rem 4rem;}.hero{padding:100px 1.2rem 60px;}
+  .panel-disc-row{grid-template-columns:1fr;gap:1px;}
+  .sp-inner{padding:72px 1.2rem 4rem;}
+}
+</style>
+</head>
+<body>
+<nav id="main-nav">
+  <button class="nav-back" id="nav-back" onclick="goList()">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2L4 7l5 5"/></svg>
+    Назад
+  </button>
+  <div class="nav-chips" id="nav-list-links">
+    <a class="nav-chip active" href="#timeline" onclick="switchView('styles',this)">Стили</a>
+    <a class="nav-chip" href="#timeline" onclick="switchView('artists',this)">Художники</a>
+    <a class="nav-chip" href="#">Произведения</a>
+  </div>
+  <a class="nav-logo" onclick="goList()">Art Historica</a>
+</nav>
+
+<div id="page-list">
+  <section class="hero">
+    <p class="hero-eyebrow">История мирового искусства</p>
+    <h1>Периоды<br>и <em>стили</em></h1>
+    <p class="hero-sub">От первобытного искусства до стрит-арта — хронология главных художественных движений</p>
+  </section>
+  <div class="ornament">· · ·</div>
+  <section class="timeline-section" id="timeline">
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Доисторический период</div><div class="century-numeral">до н.э. <span class="century-years">(~40 000 — 3000 до н.э.)</span></div></div><div class="century-content" id="era-prehistoric"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Древний мир</div><div class="century-numeral">до н.э. <span class="century-years">(3000 — 800 до н.э.)</span></div></div><div class="century-content" id="era-ancient"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Античность</div><div class="century-numeral">VIII–III вв. до н.э. <span class="century-years">(800 до н.э. — III в.)</span></div></div><div class="century-content" id="era-antiquity"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Поздняя Античность</div><div class="century-numeral">III–X вв. <span class="century-years">(300 — 1000 гг.)</span></div></div><div class="century-content" id="era-late-antique"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Высокое Средневековье</div><div class="century-numeral">XI–XIII вв. <span class="century-years">(1000 — 1300 гг.)</span></div></div><div class="century-content" id="era-high-medieval"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Позднее Средневековье</div><div class="century-numeral">XIV–XV вв. <span class="century-years">(1300 — 1490 гг.)</span></div></div><div class="century-content" id="era-late-medieval"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Высокое Возрождение</div><div class="century-numeral">кон. XV–нач. XVI <span class="century-years">(1490 — 1527 гг.)</span></div></div><div class="century-content" id="era-high-ren"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Позднее Возрождение</div><div class="century-numeral">сер.–кон. XVI <span class="century-years">(1527 — 1600 гг.)</span></div></div><div class="century-content" id="era-late-ren"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Раннее Новое время</div><div class="century-numeral">XVII–XVIII вв. <span class="century-years">(1600 — 1800 гг.)</span></div></div><div class="century-content" id="era-early-modern"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Новое время</div><div class="century-numeral">XIX в. <span class="century-years">(1800 — 1900 гг.)</span></div></div><div class="century-content" id="era-xix"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Авангард</div><div class="century-numeral">нач. XX <span class="century-years">(1900 — 1940 гг.)</span></div></div><div class="century-content" id="era-xx-early"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Модернизм</div><div class="century-numeral">сер. XX <span class="century-years">(1930 — 1970 гг.)</span></div></div><div class="century-content" id="era-xx-mid"></div></div>
+    <div class="century-block"><div class="century-mark"><div class="century-era-name">Современность</div><div class="century-numeral">кон. XX–XXI <span class="century-years">(1970 — н.в.)</span></div></div><div class="century-content" id="era-xx-late"></div></div>
+  </section>
+  <footer><p>Art Historica · История мирового искусства</p></footer>
+</div>
+
+<div id="page-style">
+  <div class="sp-inner" id="sp-content"></div>
+</div>
+
+<div id="lb-overlay">
+  <button id="lb-close-btn" onclick="lbClose()" aria-label="Закрыть">✕</button>
+  <div id="lb-img-wrap"><img id="lb-img" alt=""></div>
+  <div id="lb-bar">
+    <div id="lb-info">
+      <strong id="lb-name"></strong>
+      <span id="lb-meta"></span>
+    </div>
+    <span id="lb-count"></span>
+    <div id="lb-arrows">
+      <button class="lb-btn" id="lb-prev" onclick="lbNav(-1)" aria-label="Назад">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2L4 7l5 5"/></svg>
+      </button>
+      <button class="lb-btn" id="lb-next" onclick="lbNav(1)" aria-label="Вперёд">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+const IMAGES = {
+"Бизоны Альтамиры": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Techo_de_Altamira_%28replica%29-Museo_Arqueol%C3%B3gico_Nacional.jpg/500px-Techo_de_Altamira_%28replica%29-Museo_Arqueol%C3%B3gico_Nacional.jpg",
+"Росписи Ласко": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Lascaux_painting.jpg/500px-Lascaux_painting.jpg",
+"Рисунки пещеры Шове": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Grotte_Chauvet_P1010117mod.jpg/500px-Grotte_Chauvet_P1010117mod.jpg",
+"Венера Виллендорфская": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Venus_of_Willendorf_frontview_retouched_2.jpg/500px-Venus_of_Willendorf_frontview_retouched_2.jpg",
+"Троица": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Angelsatmamre-trinity-rublev-1410.jpg/500px-Angelsatmamre-trinity-rublev-1410.jpg",
+"Собор Святой Софии": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Hagia_Sophia_Mars_2013.jpg/500px-Hagia_Sophia_Mars_2013.jpg",
+"Нотр-Дам де Пари": "https://cdn-kz.kursiv.media/wp-content/uploads/2024/12/09-02.jpg",
+"Давид": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Michelangelo%27s_David_-_right_view_2.jpg/500px-Michelangelo%27s_David_-_right_view_2.jpg",
+"Парфенон": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/The_Parthenon_in_Athens.jpg/500px-The_Parthenon_in_Athens.jpg",
+"Колизей": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/500px-Colosseo_2020.jpg",
+"Пирамиды Гизы": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/All_Gizah_Pyramids.jpg/500px-All_Gizah_Pyramids.jpg",
+"Бюст Нефертити": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Nefertiti_%28Nofretete_in_Berlin%29.jpg",
+"Ника Самофракийская": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Nike_of_Samothrake_Louvre_Ma2369_n4.jpg/500px-Nike_of_Samothrake_Louvre_Ma2369_n4.jpg",
+"Дорифор": "https://fsd.multiurok.ru/html/2024/02/18/s_65d1cd9976bf1/phpNGePLF_Konspekt-uroka_html_d00c1a5fc7dbd298.png",
+"Сикстинская капелла": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Michelangelo_-_Creation_of_Adam_%28cropped%29.jpg/500px-Michelangelo_-_Creation_of_Adam_%28cropped%29.jpg",
+"Тайная вечеря": "https://pohcdn.com/sites/default/files/styles/paragraph__hero_banner__hb_image__1880bp/public/hero_banner/Mosaic-of-Last-supper-of-Jesus.jpg",
+"Клятва Горациев": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Le_Serment_des_Horaces_-_Jacques-Louis_David_-_Mus%C3%A9e_du_Louvre_Peintures_INV_3692_%3B_MR_1432.jpg/960px-Le_Serment_des_Horaces_-_Jacques-Louis_David_-_Mus%C3%A9e_du_Louvre_Peintures_INV_3692_%3B_MR_1432.jpg",
+"Бранденбургские ворота": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Brandenburger_Tor_abends.jpg/500px-Brandenburger_Tor_abends.jpg",
+"Паломничество на остров Киферу": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/L%27Embarquement_pour_Cyth%C3%A8re%2C_by_Antoine_Watteau%2C_from_C2RMF_retouched.jpg/960px-L%27Embarquement_pour_Cyth%C3%A8re%2C_by_Antoine_Watteau%2C_from_C2RMF_retouched.jpg",
+"Качели": "https://oformitelblok.ru/images/khudozhniki/Kacheli-Fragonara.jpg",
+"Свобода, ведущая народ": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg/960px-La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg",
+"Странник над морем тумана": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/500px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+"Плот «Медузы»": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg/960px-JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg",
+"Сборщицы колосьев": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Jean-Fran%C3%A7ois_Millet_-_Gleaners_-_Google_Art_Project_2.jpg/500px-Jean-Fran%C3%A7ois_Millet_-_Gleaners_-_Google_Art_Project_2.jpg",
+"Бурлаки на Волге": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Repin_Barge_Haulers.jpg/500px-Repin_Barge_Haulers.jpg",
+"Impression, soleil levant": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Monet_-_Impression%2C_Sunrise.jpg/500px-Monet_-_Impression%2C_Sunrise.jpg",
+"Мулен де ла Галетт": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg/500px-Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg",
+"Звёздная ночь": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/500px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+"Воскресный день на Гранд-Жатт": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg/500px-A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg",
+"Крик": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/500px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg",
+"Поцелуй": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/500px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg",
+"Дом Бальо": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Casa_Batll%C3%B3_2021_%281%29.jpg/500px-Casa_Batll%C3%B3_2021_%281%29.jpg",
+"Танец": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Matisse_Dance_%28II%29_1910.jpg/500px-Matisse_Dance_%28II%29_1910.jpg",
+"Авиньонские девицы": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Les_Demoiselles_d%27Avignon.jpg/500px-Les_Demoiselles_d%27Avignon.jpg",
+"Чёрный квадрат": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Kazimir_Malevich%2C_1915%2C_Black_Suprematic_Square%2C_oil_on_linen_canvas%2C_79.5_x_79.5_cm%2C_Tretyakov_Gallery%2C_Moscow.jpg/500px-Kazimir_Malevich%2C_1915%2C_Black_Suprematic_Square%2C_oil_on_linen_canvas%2C_79.5_x_79.5_cm%2C_Tretyakov_Gallery%2C_Moscow.jpg",
+"Фонтан": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Duchamp_Fountaine.jpg/500px-Duchamp_Fountaine.jpg",
+"Постоянство памяти": "https://upload.wikimedia.org/wikipedia/en/thumb/d/dd/The_Persistence_of_Memory.jpg/500px-The_Persistence_of_Memory.jpg",
+"Рабочий и колхозница": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Mukhina_statua.jpg/500px-Mukhina_statua.jpg",
+"Банки с супом Кэмпбелл": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3e/Campbells_Soup_Cans_MOMA.jpg/500px-Campbells_Soup_Cans_MOMA.jpg",
+"Музей Гуггенхайма (Бильбао)": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Guggenheim_Museum_Bilbao_HDR.jpg/500px-Guggenheim_Museum_Bilbao_HDR.jpg",
+"Откуда мы пришли? Кто мы?": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Paul_Gauguin_142.jpg/500px-Paul_Gauguin_142.jpg",
+"Снятие с Креста": "https://artchive.ru/res/media/img/ox800/work/2ce/673177.jpg",
+"Аркадские пастухи": "https://fabulousmasterpieces.wordpress.com/wp-content/uploads/2010/09/poussin-r1.jpg",
+"Призвание апостола Матфея": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg/960px-Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg",
+"Оранжевое и жёлтое": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Rothko_Orange_and_Yellow.jpg/330px-Rothko_Orange_and_Yellow.jpg",
+"Динамизм собаки на поводке": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c7/Giacomo_Balla%2C_1912%2C_Dynamism_of_a_Dog_on_a_Leash.jpg/500px-Giacomo_Balla%2C_1912%2C_Dynamism_of_a_Dog_on_a_Leash.jpg",
+"Деисус (Айя-София)": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Deesis_mosaic_Hagia_Sophia.jpg/960px-Deesis_mosaic_Hagia_Sophia.jpg",
+"Врата Рая": "https://artchive.ru/res/media/img/orig/work/c57/188620.jpg",
+"Рождение Венеры": "https://i.pinimg.com/736x/3c/a3/c1/3ca3c1747d4e6fc90bf31bee67f6da6e.jpg",
+"Пьета": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Michelangelo%27s_Pieta_5450_cropncleaned_edit.jpg/500px-Michelangelo%27s_Pieta_5450_cropncleaned_edit.jpg",
+"Ночной дозор": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg/960px-The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg",
+"Экстаз Святой Терезы": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Ecstasy_of_Saint_Teresa_September_2015-2a.jpg/500px-Ecstasy_of_Saint_Teresa_September_2015-2a.jpg",
+"Аполлон и Дафна": "https://upload.wikimedia.org/wikipedia/commons/d/df/ApolloAndDaphne.JPG",
+"Одна и три стула": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Joseph_Kosuth_One_and_Three_Chairs.jpg/500px-Joseph_Kosuth_One_and_Three_Chairs.jpg",
+"Велосипедист": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Goncharova_cyclist.jpg/500px-Goncharova_cyclist.jpg",
+"Оборона Петрограда": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Deineka_Defense_of_Petrograd.jpg/500px-Deineka_Defense_of_Petrograd.jpg",
+"Менины": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Las_Meninas_%281656%29%2C_by_Velazquez.jpg/960px-Las_Meninas_%281656%29%2C_by_Velazquez.jpg",
+"Большие купальщицы": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Paul_C%C3%A9zanne_150.jpg/500px-Paul_C%C3%A9zanne_150.jpg",
+"Погребение графа Оргаса": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/El_Greco_-_The_Burial_of_the_Count_of_Orgaz.JPG/960px-El_Greco_-_The_Burial_of_the_Count_of_Orgaz.JPG",
+"Мадонна с длинной шеей": "https://avatars.mds.yandex.net/i?id=efc8abd19e2b35ec91bbc807d45176c9_l-12484740-images-thumbs&n=13",
+"Похищение сабинянок": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Giambologna_raptodasabina.jpg",
+"Похищение сабинянок (Пуссен)": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Nicolas_Poussin_-_L%27Enl%C3%A8vement_des_Sabines_%281634-5%29.jpg/960px-Nicolas_Poussin_-_L%27Enl%C3%A8vement_des_Sabines_%281634-5%29.jpg",
+"Версальский дворец": "https://i.pinimg.com/originals/cd/30/0c/cd300c5200f0d6f95e8393d63c7ea560.jpg",
+"Гобелен из Байё": "https://fabrika-himchistki.ru/images/articles/news/gobelin.jpg",
+"Срез кухонным ножом": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Hannah_H%C3%B6ch_-_Cut_with_the_Dada_Kitchen_Knife.jpg/500px-Hannah_H%C3%B6ch_-_Cut_with_the_Dada_Kitchen_Knife.jpg",
+"Диптих Мэрилин": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Warhol-Marilyn.jpg/500px-Warhol-Marilyn.jpg",
+"Город встаёт": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Umberto_Boccioni%2C_1910%2C_La_citt%C3%A0_che_sale_%28The_City_Rises%29.jpg/500px-Umberto_Boccioni%2C_1910%2C_La_citt%C3%A0_che_sale_%28The_City_Rises%29.jpg",
+"Венера Брассемпуйская": "https://upload.wikimedia.org/wikipedia/commons/2/26/Venus_de_Brassempouy.jpg",
+"Статуя Хефрена": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Kairo_Museum_Sitzstatue_Chephren_06.jpg/960px-Kairo_Museum_Sitzstatue_Chephren_06.jpg",
+"Большой сфинкс": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Sphinx_with_the_third_pyramid.jpg/960px-Sphinx_with_the_third_pyramid.jpg",
+"Храм Карнак": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Temple_de_Louxor_68.jpg/960px-Temple_de_Louxor_68.jpg",
+"Лаокоон и его сыновья": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Laoco%C3%B6n_and_his_sons_group.jpg/960px-Laoco%C3%B6n_and_his_sons_group.jpg",
+"Эрехтейон": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Erechtheum_Acropolis_Athens.jpg/960px-Erechtheum_Acropolis_Athens.jpg",
+"Театр Эпидавра": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/20190511_172_epidaure.jpg/960px-20190511_172_epidaure.jpg",
+"Мозаика «Битва при Иссе»": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Battle_of_Issus_mosaic_%28from_Pompeii%29.jpg/960px-Battle_of_Issus_mosaic_%28from_Pompeii%29.jpg",
+"Август из Прима Порта": "https://kasadoo.com/assets/site/images/album/Switzerland/Bern/Emperor-Augustus-Statue.jpg",
+"Колонна Траяна": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Colonna_Traiana%2C_Rome_%2815049614427%29.jpg",
+"Конная статуя Марка Аврелия": "https://i.pinimg.com/originals/4a/96/bd/4a96bd2906bce0475055ef781cc677da.jpg",
+"Пантеон": "https://www.tripsavvy.com/thmb/74NtyaW1-HdL9riTJHoD9LtErXc=/2118x1415/filters:no_upscale()/GettyImages-784776-001-584ed9845f9b58a8cd2cf0e3.jpg",
+"Акведук Пон-дю-Гар": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pont_du_Gard_Oct_2007.jpg/960px-Pont_du_Gard_Oct_2007.jpg",
+"Мозаики Равенны": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Sacrifice_of_Isaac_mosaic_-_Basilica_San_Vitale_%28Ravenna%29.jpg/960px-Sacrifice_of_Isaac_mosaic_-_Basilica_San_Vitale_%28Ravenna%29.jpg",
+"Базилика Сан-Витале": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Ravenna_SanVitale_0060.jpg/960px-Ravenna_SanVitale_0060.jpg",
+"Собор Святого Марка": "https://avatars.dzeninfra.ru/get-zen_doc/61795/pub_6297e3ccb4643b21c69e7c3b_6297e7b378becc254d9bfcdc/scale_2400",
+"Собор в Вормсе": "https://tourpedia.ru/wp-content/uploads/2018/01/%D0%BF%D0%B0%D0%BD%D0%BE%D1%80%D0%B0%D0%BC%D0%B0-%D0%92%D0%BE%D1%80%D0%BC%D1%81%D1%81%D0%BA%D0%BE%D0%B3%D0%BE-%D1%81%D0%BE%D0%B1%D0%BE%D1%80%D0%B0-730x430.jpg",
+"Базилика Сен-Сернен": "https://www.vparis.net/media/rokgallery/6/60da3e74-0d45-4fd1-9fee-094267bac2a9/e6edeb3d-c9af-4364-e3bd-b0c155190e80.jpg",
+"Собор в Дареме": "https://www.revigorate.com/images/Durham-Cathedral-durham.jpg",
+"Витражи Шартрского собора": "https://kulturologia.ru/files/u30116/sobor3.jpg",
+"Маэста": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Maest_001_duccio_siena_duomo.jpg/960px-Maest_001_duccio_siena_duomo.jpg",
+"Маэста Чимабуэ": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/La_Vierge_et_l%27Enfant_en_majest%C3%A9_entour%C3%A9s_de_six_anges_-_Cimabue_-_Mus%C3%A9e_du_Louvre_Peintures_INV_254_%3B_MR_159.jpg/960px-La_Vierge_et_l%27Enfant_en_majest%C3%A9_entour%C3%A9s_de_six_anges_-_Cimabue_-_Mus%C3%A9e_du_Louvre_Peintures_INV_254_%3B_MR_159.jpg",
+"Шартрский собор": "https://i.pinimg.com/originals/ed/da/c0/eddac030ad342a43554da471cf0364a8.png",
+"Сент-Шапель": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Sainte_Chapelle_Ch%C3%A2teau_Vincennes_-_Vincennes_%28FR94%29_-_2020-10-10_-_21_%28cropped%29.jpg",
+"Оплакивание Христа": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Compianto_sul_Cristo_morto.jpg/960px-Compianto_sul_Cristo_morto.jpg",
+"Купол Флорентийского собора": "https://i.pinimg.com/736x/96/c8/15/96c8151919715a90fa9daab117a79f71.jpg",
+"Сикстинская мадонна": "https://i.pinimg.com/originals/76/11/f2/7611f2bff78f20224c56954e1d04d760.jpg",
+"Темпьетто": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Tempietto_di_San_Pietro_in_Montorio.jpg/960px-Tempietto_di_San_Pietro_in_Montorio.jpg",
+"Персей с головой Медузы": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Perseus_Cellini_Loggia_dei_Lanzi_2005_09_13.jpg/960px-Perseus_Cellini_Loggia_dei_Lanzi_2005_09_13.jpg",
+"Меркурий": "https://i.pinimg.com/736x/60/cd/70/60cd70615b2fb1ed1ef6a1666fb07284.jpg",
+"Вилла Ротонда": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Villa_Rotonda_side.jpg/960px-Villa_Rotonda_side.jpg",
+"Площадь Собора Св. Петра": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg/960px-Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg",
+"Сан-Карло алле Кватро Фонтане": "https://img.pac.ru/landmarks/371916/big/AB319CF57F000101499E01766E6F7419.jpg",
+"Собор Святого Павла (Лондон)": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/St_Pauls_aerial.jpg/960px-St_Pauls_aerial.jpg",
+"Диана после охоты": "https://i.pinimg.com/originals/b3/af/7f/b3af7f1bb3d312ff9be6b22cdc7f8c1f.jpg",
+"Дворец Сан-Суси (Потсдам)": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/20220810_Schloss_Sanssouci_10.jpg/960px-20220810_Schloss_Sanssouci_10.jpg",
+"Смерть Сократа": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/David_-_The_Death_of_Socrates.jpg/960px-David_-_The_Death_of_Socrates.jpg",
+"Большая одалиска": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Jean_Auguste_Dominique_Ingres%2C_La_Grande_Odalisque%2C_1814.jpg/960px-Jean_Auguste_Dominique_Ingres%2C_La_Grande_Odalisque%2C_1814.jpg",
+"Психея, разбуженная Амуром": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Psyche_revived_by_cupid%27s_kiss%2C_Paris_2_October_2011_002.jpg/960px-Psyche_revived_by_cupid%27s_kiss%2C_Paris_2_October_2011_002.jpg",
+"Пантеон (Париж)": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Pantheon_of_Paris_007.JPG/960px-Pantheon_of_Paris_007.JPG",
+"Белый дом": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/WhiteHouseSouthFacade.JPG/960px-WhiteHouseSouthFacade.JPG",
+"Марсельеза (Триумфальная арка)": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/La_Marseillaise%2C_Arc_de_Triomphe%2C_2_August_2015.jpg/960px-La_Marseillaise%2C_Arc_de_Triomphe%2C_2_August_2015.jpg",
+"Дробильщики камня": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Courbet_-_The_Stonebreakers.jpg/960px-Courbet_-_The_Stonebreakers.jpg",
+"Человек со сломанным носом": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/August_Rodin_-_mask_of_the_man_with_the_broken_nose_1863.jpg/960px-August_Rodin_-_mask_of_the_man_with_the_broken_nose_1863.jpg",
+"Железопрокатный завод": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Adolph_Menzel_-_Iron_Rolling_Mill.jpg/960px-Adolph_Menzel_-_Iron_Rolling_Mill.jpg",
+"Циклоп": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Odilon_Redon_-_The_Cyclops%2C_c._1914.jpg/960px-Odilon_Redon_-_The_Cyclops%2C_c._1914.jpg",
+"Юдифь I": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Judith_I_-_Gustav_Klimt.jpg/960px-Judith_I_-_Gustav_Klimt.jpg",
+"Особняк Тасселя": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Victor_Horta_Hotel_Tassel.JPG/960px-Victor_Horta_Hotel_Tassel.JPG",
+"Вход в метро (Париж)": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Hector-Guimard-%281907%29.jpg",
+"Невеста ветра": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8c/%27Bride_of_the_Wind%27%2C_oil_on_canvas_painting_by_Oskar_Kokoschka%2C_a_self-portrait_expressing_his_unrequited_love_for_Alma_Mahler_%28widow_of_composer_Gustav_Mahler%29%2C_1913.jpg/960px-thumbnail.jpg",
+"Башня Эйнштейна (Потсдам)": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Potsdam_Telegrafenberg_asv2023-09_img4.jpg/960px-Potsdam_Telegrafenberg_asv2023-09_img4.jpg",
+"Уникальные формы непрерывности в пространстве": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/%27Unique_Forms_of_Continuity_in_Space%27%2C_1913_bronze_by_Umberto_Boccioni.jpg/960px-%27Unique_Forms_of_Continuity_in_Space%27%2C_1913_bronze_by_Umberto_Boccioni.jpg",
+"Башня III Интернационала (проект)": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Tatlin%27s_Tower_maket_1919_year.jpg/960px-Tatlin%27s_Tower_maket_1919_year.jpg",
+"Птица в пространстве": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Brancusi_Bird_in_Space_at_MOMA.jpg/960px-Brancusi_Bird_in_Space_at_MOMA.jpg",
+"Белое на белом": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Kazimir_Malevich%2C_White_on_White%2C_1918.jpg/960px-Kazimir_Malevich%2C_White_on_White%2C_1918.jpg",
+"«Клином красным бей белых»": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/El_Lissitzky_-_Beat_the_Whites_with_the_Red_Wedge.jpg/960px-El_Lissitzky_-_Beat_the_Whites_with_the_Red_Wedge.jpg",
+"Клуб Русакова (Москва)": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Moscow_-_Rusakov_Club_by_Melnikov.jpg/960px-Moscow_-_Rusakov_Club_by_Melnikov.jpg",
+"Дом Наркомфина": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Narkomfin_Building.jpg/960px-Narkomfin_Building.jpg",
+"L.H.O.O.Q.": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Duchamp_LHOOQReproduction.jpg/960px-Duchamp_LHOOQReproduction.jpg",
+"Это не трубка": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b9/MagrittePipe.jpg/960px-MagrittePipe.jpg",
+"Две Фриды": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1e/Two_Fridas.jpg/960px-Two_Fridas.jpg",
+"Завтрак в мехах": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/Meret_Oppenheim_-_Object_%28Le_D%C3%A9jeuner_en_fourrure%29.jpg/960px-Meret_Oppenheim_-_Object_%28Le_D%C3%A9jeuner_en_fourrure%29.jpg",
+"Новая Москва": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/New_Moscow_by_Pimenov.jpg/960px-New_Moscow_by_Pimenov.jpg",
+"МГУ (главный корпус)": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Moscow_State_University_crop.jpg/960px-Moscow_State_University_crop.jpg",
+"Мавзолей Ленина": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Lenin%27s_Mausoleum_%28Shrine_of_Lenin%29_in_Kremlin_7.jpg/960px-Lenin%27s_Mausoleum_%28Shrine_of_Lenin%29_in_Kremlin_7.jpg",
+"Номер 31": "https://upload.wikimedia.org/wikipedia/en/thumb/9/92/Pollock_No_31.jpg/960px-Pollock_No_31.jpg",
+"Женщина I": "https://upload.wikimedia.org/wikipedia/en/thumb/7/71/De_Kooning_Woman_I.jpg/960px-De_Kooning_Woman_I.jpg",
+"Утопленница": "https://upload.wikimedia.org/wikipedia/commons/b/be/Roy_Lichtenstein_Drowning_Girl_narrative.jpg",
+"Мягкий унитаз": "https://upload.wikimedia.org/wikipedia/en/thumb/d/da/Soft_Toilet.jpg/960px-Soft_Toilet.jpg",
+"Эквивалент VIII": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Carl_Andre_Equivalent_VIII.jpg/960px-Carl_Andre_Equivalent_VIII.jpg",
+"Ритм 0": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Marina_Abramovic_in_2010.jpg/960px-Marina_Abramovic_in_2010.jpg",
+"Окружённые острова": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Surrounded_Islands_Christo.jpg/960px-Surrounded_Islands_Christo.jpg",
+"Кинокадры без названия (серия)": "https://upload.wikimedia.org/wikipedia/en/7/79/Untitled_Film_Still_21_%28Cindy_Sherman_photograph%29.jpg",
+"Кролик": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Jeff_Koons_Rabbit_1986.jpg/960px-Jeff_Koons_Rabbit_1986.jpg",
+"Здание AT&T (Нью-Йорк)": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/550_Madison_Avenue_2021.jpg/960px-550_Madison_Avenue_2021.jpg",
+"Публичная библиотека Сиэтла": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Seattle_Public_Library_main_branch_glass_facade.jpg/960px-Seattle_Public_Library_main_branch_glass_facade.jpg",
+"Девочка с шариком": "https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Banksy_Girl_and_Heart_Balloon.jpg/960px-Banksy_Girl_and_Heart_Balloon.jpg",
+"Чёрные картины (серия)": "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/Stella_Marriage_of_reason.jpg/960px-Stella_Marriage_of_reason.jpg",
+"Красный синий зелёный": "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Ellsworth_Kelly_Red_Blue_Green.jpg/960px-Ellsworth_Kelly_Red_Blue_Green.jpg",
+"Абстрактная картина": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Ad_Reinhardt%27s_Abstract_Painting%2C_No._5_-_1962.jpg/960px-Ad_Reinhardt%27s_Abstract_Painting%2C_No._5_-_1962.jpg",
+"Специфические объекты (серия)": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Donald_Judd_-_Untitled_%281980%29.jpg/960px-Donald_Judd_-_Untitled_%281980%29.jpg",
+"Диагональ 25 мая 1963": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Dan_Flavin_-_Diagonal_of_May_25%2C_1963_%28to_Constantin_Brancusi%29.jpg/960px-Dan_Flavin_-_Diagonal_of_May_25%2C_1963_%28to_Constantin_Brancusi%29.jpg",
+"Vanitas": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Audrey_Flack_1981.jpg/960px-Audrey_Flack_1981.jpg",
+"Супермаркет-леди": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Duane_Hanson_SupermarketShopper1970.jpg/960px-Duane_Hanson_SupermarketShopper1970.jpg",
+"Большой мальчик": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Boy_Mueck.JPG/960px-Boy_Mueck.JPG",
+"Ohne Titel (перевёрнутая фигура)": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Georg_Baselitz_2007.jpg/960px-Georg_Baselitz_2007.jpg",
+"После Уокера Эванса": "https://d1hhug17qm51in.cloudfront.net/www-media/2026/05/20165816/91.68_01_P02.jpg",
+"Вход в бухту Марселя": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Signac_-_Entr%C3%A9e_du_port_de_Marseille%2C_1898%2C_KM_103.185.jpg/960px-Signac_-_Entr%C3%A9e_du_port_de_Marseille%2C_1898%2C_KM_103.185.jpg",
+"Побережье Прованса": "https://upload.wikimedia.org/wikipedia/commons/8/82/Cross_-_Les_Iles_d%27Or.JPG",
+"Лев, пожирающий змею": "https://i.pinimg.com/736x/41/12/ab/4112aba07a6ca987e8ce4adff6884616.jpg",
+"Тезей и Минотавр": "https://upload.wikimedia.org/wikipedia/commons/2/29/Theseus_Slaying_Minotaur_by_Barye.jpg",
+"Грузчик": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Le_porteur_de_charbon.jpg/960px-Le_porteur_de_charbon.jpg",
+"Пудлинговщик": "https://upload.wikimedia.org/wikipedia/commons/0/01/Constantin_Meunier_-_De_puddeler.jpg",
+"Картофельный урожай": "https://upload.wikimedia.org/wikipedia/commons/5/51/Jules_Bastien-Lepage_-_October_-_Google_Art_Project.jpg",
+"Деревенские работницы": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Liebermann_Arbeiter_R%C3%BCbenfeld.jpg",
+"Конструкция в пространстве": "https://upload.wikimedia.org/wikipedia/commons/a/a7/%27Spheric_Theme_%28Penetrated_Variation%29%27_by_Naum_Gabo%2C_Tate_Modern.jpg",
+"Спящая муза": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Brancusi_sleeping_muse_I_1909_10.jpg/960px-Brancusi_sleeping_muse_I_1909_10.jpg",
+"Аэроплан в полёте": "https://upload.wikimedia.org/wikipedia/commons/7/73/Suprematist_Composition_-_Airplane_Flying_%28Malevich%2C_1915%29.jpg",
+"Салон принцессы (Отель Субиз)": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Salon_Oval_de_la_Princesse_of_the_H%C3%B4tel_de_Soubise_%28Paris%29.jpg",
+"Дворец Амалиенбург": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/2008-07-15Muenchen_Nymphenburgerpark_Amalienburg.jpg/960px-2008-07-15Muenchen_Nymphenburgerpark_Amalienburg.jpg",
+"Надгробие кардинала де Брей": "https://avatars.dzeninfra.ru/get-zen_doc/3964212/pub_614ebf4dd8681137d43d54f9_614ec35f1940e92814225ecd/scale_2400",
+"Распятие с кафедры Св. Андреаса": "https://avatars.dzeninfra.ru/get-zen_doc/3435109/pub_614ebf4dd8681137d43d54f9_614ec66c1fa5b87eb574e9c6/scale_2400",
+"Воспитательный дом (Флоренция)": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Florence%2C_Piazza_SS_Annunziata_with_Ospedale_degli_Innocenti_%281419-39%29_and_part_of_SS_Annunziata_%281601%29.jpg/960px-Florence%2C_Piazza_SS_Annunziata_with_Ospedale_degli_Innocenti_%281419-39%29_and_part_of_SS_Annunziata_%281601%29.jpg",
+"Надгробие Элеоноры Аквитанской": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Church_of_Fontevraud_Abbey_Eleanor_of_Aquitaine_effigy.jpg/960px-Church_of_Fontevraud_Abbey_Eleanor_of_Aquitaine_effigy.jpg",
+"Автопортрет с поднятым локтем": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Egon_Schiele_-_Self-Portrait_with_Physalis_-_Google_Art_Project.jpg/960px-Egon_Schiele_-_Self-Portrait_with_Physalis_-_Google_Art_Project.jpg",
+"Большой драматический театр (Берлин)": "https://upload.wikimedia.org/wikipedia/commons/6/60/Berlin_Grosses_Schauspielhaus_Poelzig_Foyer.jpg",
+"Завтрак": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Juan_gris%2C_le_petit_dejeuner%2C_1914.jpg/960px-Juan_gris%2C_le_petit_dejeuner%2C_1914.jpg",
+"Женщина, расчёсывающая волосы": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Alexander_Archipenko_-_Woman_Combing_her_Hair%2C_1915_%28cast_1919%29_-_Google_Art_Project.jpg/960px-Alexander_Archipenko_-_Woman_Combing_her_Hair%2C_1915_%28cast_1919%29_-_Google_Art_Project.jpg",
+"Похороны анархиста Галли": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Carlo_Carr%C3%A0%2C_1910-11%2C_Funeral_of_the_Anarchist_Galli%2C_oil_on_canvas%2C_198.7_x_259.1_cm%2C_Museum_of_Modern_Art%2C_New_York.jpg/960px-Carlo_Carr%C3%A0%2C_1910-11%2C_Funeral_of_the_Anarchist_Galli%2C_oil_on_canvas%2C_198.7_x_259.1_cm%2C_Museum_of_Modern_Art%2C_New_York.jpg",
+"Развитие бутылки в пространстве": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Development_of_a_Bottle_in_Space_by_Umberto_Boccioni%2C_1912.jpg/960px-Development_of_a_Bottle_in_Space_by_Umberto_Boccioni%2C_1912.jpg",
+"Живописная архитектоника": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Lyubov_Popova._Painterly_Architectonic%2C_1916._Oil_on_board%2C_59.5_x_39.5_cm.jpg/960px-Lyubov_Popova._Painterly_Architectonic%2C_1916._Oil_on_board%2C_59.5_x_39.5_cm.jpg",
+"Мерц-конструкция": "https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/Kurt_Schwitters%2C_Merzbau%2C_1937.jpg/960px-Kurt_Schwitters%2C_Merzbau%2C_1937.jpg",
+"Слон Целебес": "https://upload.wikimedia.org/wikipedia/en/thumb/a/ab/Max_Ernst_-_The_Elephant_Celebes_-_1921.jpg/960px-Max_Ernst_-_The_Elephant_Celebes_-_1921.jpg",
+"Дворец в 4 часа ночи": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Alberto_Giacometti%2C_1932%2C_Le_Palais_%C3%A0_quatre_heures_du_matin_%28The_Palace_at_4_a.m.%29%2C_wood%2C_glass%2C_wire%2C_string%2C_64.5_x_69.5_x_31.6_cm%2C_Museum_of_Modern_Art%2C_New_York.jpg/960px-Alberto_Giacometti%2C_1932%2C_Le_Palais_%C3%A0_quatre_heures_du_matin_%28The_Palace_at_4_a.m.%29%2C_wood%2C_glass%2C_wire%2C_string%2C_64.5_x_69.5_x_31.6_cm%2C_Museum_of_Modern_Art%2C_New_York.jpg",
+"Висящий шар": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Giacometti_-_Boule_suspendue_1930-31.jpg/960px-Giacometti_-_Boule_suspendue_1930-31.jpg",
+"Сталин и Ворошилов в Кремле": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Stalin_and_Voroshilov_in_the_Kremlin.jpg/960px-Stalin_and_Voroshilov_in_the_Kremlin.jpg",
+"Сталинские высотки Москвы": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Moscow_Seven_Sisters_Collage.jpg/960px-Moscow_Seven_Sisters_Collage.jpg",
+"Фил": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Chuck_Close%2C_self-portrait%2C_1977.jpg/960px-Chuck_Close%2C_self-portrait%2C_1977.jpg",
+"Телефонные будки": "https://www.museothyssen.org/sites/default/files/styles/full_resolution/public/imagen/2023-10/ESTES%2C%20Richard_Cabinas%20telefonicas_539%20%281977.93%29_0.jpg",
+"Батай на Бувин": "https://www.centrepompidou.fr/media/picture/5a/27/5a278eaf68c3a4432804d7ef1f9a762f/thumb_large.jpg",
+"Заложники": "https://live.staticflickr.com/1734/27703967577_5b8a97f986.jpg",
+"Серия «Нуар»": "https://www.centrepompidou.fr/media/picture/4d/83/4d83e55c34d37faef09f28f39397e23a/thumb_large.jpg",
+"Гамбургер Флор": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Claes_Oldenburg_2012.jpg/960px-Claes_Oldenburg_2012.jpg",
+"Автобусные пассажиры": "https://live.staticflickr.com/7231/7035401745_9f57bc4e1f_b.jpg",
+"Маргарет и Марианна фон Браухич": "https://d1hhug17qm51in.cloudfront.net/www-media/2026/05/20162613/FC.595_01_H02.jpg",
+"Без названия": "https://upload.wikimedia.org/wikipedia/en/thumb/1/11/Untitled-Head-Jean-Michel_Basquiat-1981.jpg/500px-Untitled-Head-Jean-Michel_Basquiat-1981.jpg",
+"Теги САМО© (Нью-Йорк)": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Jean-Michel_Basquiat_-_MoCA.jpg/960px-Jean-Michel_Basquiat_-_MoCA.jpg",
+"Фрески Сан-Клементе-де-Тауль": "https://thumbs.dreamstime.com/b/taull-climent-de-pantocrator-sant-20166583.jpg",
+"Тимпан «Страшный суд» (Отён)": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjeQ9DaCks2bRb6KReHnTd9jZ5ZTFLyFtUw8djxMhqHf71ljPbmfg0PSIM53b9ySsN9clclUz6L55zGypqSgjLSKsSaXEF2F5Z1Uw22IB-nexqX28NfGGD-m1ttdddP0P3A9NtQMFErAKg/s1600/Conque+portal+.jpg",
+"Капители Сен-Лазар": "https://homeofangels.ru/wp-content/uploads/2024/02/001-angels-excursion-600x400.jpg",
+"Портал Королей (Шартр)": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Chartres_-_portail_royal%2C_tympan_central.jpg/960px-Chartres_-_portail_royal%2C_tympan_central.jpg",
+"Кафедра баптистерия (Пиза)": "https://staff.washington.edu/rmcnamar/arthistory/BaptPulp1.jpg",
+"Пейзаж с Энеем на Делосе": "https://ir.ozone.ru/s3/multimedia-1-b/8340082751.jpg",
+"Дом инвалидов (купол)": "https://fs.tonkosti.ru/eg/ou/egou64omk1kwok8g0w44gsc0w.jpg",
+"Фабрика шляп (Люккенвальде)": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Mendelsohn_Hat_Factory.jpg/960px-Mendelsohn_Hat_Factory.jpg",
+"Матрос": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Jacques_Lipchitz%2C_1916%2C_Sailor_with_Guitar%2C_plaster%2C_Coll._R._Lipchitz.jpg/960px-Jacques_Lipchitz%2C_1916%2C_Sailor_with_Guitar%2C_plaster%2C_Coll._R._Lipchitz.jpg",
+"Обложки журнала «ЛЕФ»": "https://live.staticflickr.com/8248/8487732958_c6b900c75b.jpg",
+"Собственный дом Мельникова": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Melnikov_house.jpg/960px-Melnikov_house.jpg",
+"Подарок (утюг с гвоздями)": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Man_Ray%2C_1921%2C_Cadeau_%28The_Gift%29%2C_replica_1972%2C_painted_flatiron_with_row_of_13_tacks_with_heads_glued_to_the_bottom%2C_15.3_x_9_x_11.4_cm%2C_MoMA_New_York.jpg/960px-Man_Ray%2C_1921%2C_Cadeau_%28The_Gift%29%2C_replica_1972%2C_painted_flatiron_with_row_of_13_tacks_with_heads_glued_to_the_bottom%2C_15.3_x_9_x_11.4_cm%2C_MoMA_New_York.jpg",
+"Бюст Вольтера": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Jean-Antoine_Houdon%2C_voltaire%2C_1781.JPG",
+"Благовещение": "https://artchive.ru/res/media/img/oy800/work/49c/227038@2x.jpg",
+"Улыбающийся ангел (Реймс)": "https://upload.wikimedia.org/wikipedia/commons/9/93/F3369_Reims_Cathedrale_portail_gauche_ange_rwk.jpg",
+"Танцовщицы у станка": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Edgar_Germain_Hilaire_Degas_048.jpg/960px-Edgar_Germain_Hilaire_Degas_048.jpg",
+"Скрипка и подсвечник": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Braque_-_Violin_and_Candlestick.jpg/960px-Braque_-_Violin_and_Candlestick.jpg",
+"Плакат «Книги»": "https://cdn.gallerix.asia/sr/_UNK/1973977528/19607297.jpg",
+"Плакат «Жизмонда»": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Alphonse_Mucha_-_1895_-_Gismonda.jpg/960px-Alphonse_Mucha_-_1895_-_Gismonda.jpg",
+"Радость жизни": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Matisse-Bonheur.jpg/960px-Matisse-Bonheur.jpg",
+"Лондонский мост": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Andr%C3%A9_Derain_-_London_Bridge_-_Google_Art_Project.jpg/960px-Andr%C3%A9_Derain_-_London_Bridge_-_Google_Art_Project.jpg",
+"Уличная сцена в Берлине": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Ernst_Ludwig_Kirchner_Potsdamer_Platz.jpg/960px-Ernst_Ludwig_Kirchner_Potsdamer_Platz.jpg",
+"Фрески капеллы Скровеньи": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Giotto_di_Bondone_-_Legend_of_St_Francis_-_Scenes_Nos._1-3_-_WGA09115.jpg/960px-Giotto_di_Bondone_-_Legend_of_St_Francis_-_Scenes_Nos._1-3_-_WGA09115.jpg",
+"Апокалипсис Беата": "https://dic.academic.ru/pictures/wiki/files/65/ApocalypseStSeverFol108v109r4Horsemen.jpg",
+"«Снятие с Креста» (Парма)": "https://img-fotki.yandex.ru/get/59115/10953784.3e/0_c79bb_f645e814_XL.jpg",
+"Проуны": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Proun_4_B_%281919_-_1920%29.jpg/960px-Proun_4_B_%281919_-_1920%29.jpg",
+"Надежда": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Obama_Hope_poster.jpg/960px-Obama_Hope_poster.jpg",
+"Фрески гробницы Нахта": "https://www.burana.ru/pics/745_1568388177.jpg",
+"Роспись гробницы Небамуна": "https://telegra.ph/file/473e97ea244d573e4902a.png",
+"«Писец»": "https://telegra.ph/file/c6224d7365ad74552cc73.png",
+"Папирус «Книги мёртвых» Ани": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Ani_LDM_fin.jpg/500px-Ani_LDM_fin.jpg",
+"Килик с Эдипом и Сфинксом": "https://i.pinimg.com/736x/0d/41/68/0d4168c5abd25524472348e16809671f.jpg",
+"Амфора с Ахиллом и Аяксом": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Attic_Black-Figure_Neck_Amphora_-_Achilles_and_Ajax_playing_a_board_game_overseen_by_Athena.jpg/960px-Attic_Black-Figure_Neck_Amphora_-_Achilles_and_Ajax_playing_a_board_game_overseen_by_Athena.jpg",
+"Сад виллы Ливии": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Villa_of_Livia_-_Garden_fresco_001.jpg/960px-Villa_of_Livia_-_Garden_fresco_001.jpg",
+"Помпейские фрески": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Roman_fresco_Villa_dei_Misteri_Pompeii_005.jpg",
+"Композиция VIII": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Vassily_Kandinsky%2C_1923_-_Composition_8%2C_huile_sur_toile%2C_140_cm_x_201_cm%2C_Mus%C3%A9e_Guggenheim%2C_New_York.jpg/960px-Vassily_Kandinsky%2C_1923_-_Composition_8%2C_huile_sur_toile%2C_140_cm_x_201_cm%2C_Mus%C3%A9e_Guggenheim%2C_New_York.jpg",
+"Человек-лев из Холенштайн-Штаделя": "https://warriorpath.info/wp-content/uploads/2023/11/chelovekolev.jpg",
+"Кратер с Дионисом": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Krater_Dionysos_Walters_Art_Museum_48.74.jpg/960px-Krater_Dionysos_Walters_Art_Museum_48.74.jpg",
+"Ганимед кормящий орла": "https://i.pinimg.com/originals/48/24/00/4824001403176d0d7e8ef29d3bd30b50.jpg",
+"Неоновые инсталляции": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Bruce_Nauman%2C_1994.jpg/500px-Bruce_Nauman%2C_1994.jpg",
+"Теги SAMO© (Нью-Йорк)": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Jean-Michel_Basquiat_-_MoCA.jpg/500px-Jean-Michel_Basquiat_-_MoCA.jpg",
+"Портрет Кирова": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Sergei_Kirov.jpg/500px-Sergei_Kirov.jpg",
+"Памятник Ленину": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Lenin%27s_Mausoleum_%28Shrine_of_Lenin%29_in_Kremlin_7.jpg/500px-Lenin%27s_Mausoleum_%28Shrine_of_Lenin%29_in_Kremlin_7.jpg",
+"Формы пространства": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Alexander_Archipenko_-_Woman_Combing_her_Hair%2C_1915_%28cast_1919%29_-_Google_Art_Project.jpg/500px-Alexander_Archipenko_-_Woman_Combing_her_Hair%2C_1915_%28cast_1919%29_-_Google_Art_Project.jpg",
+"Композиция II в красном, синем и жёлтом": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Mondrian_Composition_II_in_Red%2C_Blue%2C_and_Yellow.jpg/500px-Mondrian_Composition_II_in_Red%2C_Blue%2C_and_Yellow.jpg",
+"Фуга в красном": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Paul_Klee%2C_1921%2C_Fugue_in_Red.jpg/500px-Paul_Klee%2C_1921%2C_Fugue_in_Red.jpg",
+"Антиграсия": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/%27Unique_Forms_of_Continuity_in_Space%27%2C_1913_bronze_by_Umberto_Boccioni.jpg/500px-%27Unique_Forms_of_Continuity_in_Space%27%2C_1913_bronze_by_Umberto_Boccioni.jpg",
+"Настенные рисунки (серия)": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Sol_LeWitt_-_Wall_Drawing.jpg/500px-Sol_LeWitt_-_Wall_Drawing.jpg",
+"Грейпфрутовая книга инструкций": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Yoko_Ono_2009.jpg/500px-Yoko_Ono_2009.jpg",
+"Автопортрет с черепом": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Boy_Mueck.JPG/500px-Boy_Mueck.JPG",
+"Явление": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Gustave_Moreau_-_L%27Apparition_-_Google_Art_Project.jpg/500px-Gustave_Moreau_-_L%27Apparition_-_Google_Art_Project.jpg"
+};
+
+const STYLES = [
+  {era:'era-prehistoric',name:'Первобытное искусство',dates:'~40 000 — 3000 до н.э.',tag:'Живопись · Скульптура · Ритуал',themes:['пещерная живопись','охотничья магия','ритуал','плодородие','смерть'],desc:'Древнейшие изображения животных на стенах пещер, ритуальные фигурки, орнаменты на костях. Искусство как магия, охотничий ритуал и коллективная память задолго до письменности. Первобытное искусство доказывает: символическое мышление — сущность человека. Способность создавать изображение — не украшение эволюции, а её двигатель.',
+   disciplines:[{title:'Живопись',authors:['Анонимные авторы эпохи палеолита'],works:[{name:'Бизоны Альтамиры',author:'Аноним',year:'~15 000 до н.э.'},{name:'Росписи Ласко',author:'Аноним',year:'~17 000 до н.э.'},{name:'Рисунки пещеры Шове',author:'Аноним',year:'~36 000 до н.э.'}]},{title:'Скульптура',authors:['Анонимные мастера эпохи палеолита'],works:[{name:'Венера Виллендорфская',author:'Аноним',year:'~28 000 до н.э.'},{name:'Венера Брассемпуйская',author:'Аноним',year:'~25 000 до н.э.'},{name:'Человек-лев из Холенштайн-Штаделя',author:'Аноним',year:'~40 000 до н.э.'}]}]},
+  {era:'era-ancient',name:'Древний Египет',dates:'~3100 — 30 до н.э.',tag:'Живопись · Скульптура · Архитектура',themes:['вечность','загробная жизнь','фараон','канон','иератизм'],desc:'Три тысячи лет единого канона. Фигура показана по особым правилам: голова в профиль, плечи анфас, ноги в профиль — не потому что египтяне «не умели», а потому что изображение должно быть полным и вечным. Искусство Египта служит смерти и загробной жизни — всё создано не для живых зрителей, а для вечного существования.',
+   disciplines:[{title:'Живопись',authors:['Анонимные мастера (артели)'],works:[{name:'Фрески гробницы Нахта',author:'Аноним',year:'~1400 до н.э.'},{name:'Роспись гробницы Небамуна',author:'Аноним',year:'~1350 до н.э.'},{name:'Папирус «Книги мёртвых» Ани',author:'Аноним',year:'~1275 до н.э.'}]},{title:'Скульптура',authors:['Тутмос — скульптор Эхнатона'],works:[{name:'Бюст Нефертити',author:'Тутмос',year:'~1345 до н.э.'},{name:'«Писец»',author:'Аноним',year:'~2500 до н.э.'},{name:'Статуя Хефрена',author:'Аноним',year:'~2530 до н.э.'}]},{title:'Архитектура',authors:['Имхотеп','Хемиун'],works:[{name:'Пирамиды Гизы',author:'Хемиун и др.',year:'~2560 до н.э.'},{name:'Большой сфинкс',author:'Аноним',year:'~2500 до н.э.'},{name:'Храм Карнак',author:'Аноним',year:'~1550–30 до н.э.'}]}]},
+  {era:'era-antiquity',name:'Древняя Греция',dates:'~800 — 31 до н.э.',tag:'Скульптура · Архитектура · Вазопись',themes:['красота','гармония','идеал тела','мифология','демократия'],desc:'Идеальное тело, математическая гармония, красота как истина. Греки открыли, что искусство может изображать идеал человека. Три этапа — архаика, классика, эллинизм — три разных понимания того, что значит «красота».',
+   disciplines:[{title:'Живопись / Вазопись',authors:['Дурис','Эксекий','Апеллес (работы не сохранились)'],works:[{name:'Килик с Эдипом и Сфинксом',author:'Дурис',year:'~480 до н.э.'},{name:'Амфора с Ахиллом и Аяксом',author:'Эксекий',year:'~530 до н.э.'},{name:'Кратер с Дионисом',author:'Мидий',year:'~420 до н.э.'}]},{title:'Скульптура',authors:['Фидий','Поликлет','Пракситель','Лисипп'],works:[{name:'Дорифор',author:'Поликлет',year:'~450 до н.э.'},{name:'Ника Самофракийская',author:'Аноним',year:'~190 до н.э.'},{name:'Лаокоон и его сыновья',author:'Агесандр и др.',year:'~200 до н.э.'}]},{title:'Архитектура',authors:['Иктин и Калликрат','Мнесикл'],works:[{name:'Парфенон',author:'Иктин и Калликрат',year:'447–438 до н.э.'},{name:'Эрехтейон',author:'Мнесикл',year:'421–406 до н.э.'},{name:'Театр Эпидавра',author:'Поликлет Младший',year:'~350 до н.э.'}]}]},
+  {era:'era-antiquity',name:'Древний Рим',dates:'~509 до н.э. — 476 н.э.',tag:'Живопись · Скульптура · Архитектура',themes:['государство','триумф','портрет','иллюзия','власть'],desc:'Рим унаследовал греческие формы, но поставил их на службу государству и личности. Реалистичный портрет, триумфальные арки, иллюзионистические фрески — искусство как политический документ. Бетон и арка позволили строить Колизей и Пантеон.',
+   disciplines:[{title:'Живопись',authors:['Анонимные мастера Помпей и Геркуланума'],works:[{name:'Сад виллы Ливии',author:'Аноним',year:'~30 до н.э.'},{name:'Мозаика «Битва при Иссе»',author:'Аноним',year:'~100 до н.э.'},{name:'Помпейские фрески',author:'Аноним',year:'I в.'}]},{title:'Скульптура',authors:['Анонимные мастера'],works:[{name:'Август из Прима Порта',author:'Аноним',year:'~20 до н.э.'},{name:'Колонна Траяна',author:'Аноним',year:'113 н.э.'},{name:'Конная статуя Марка Аврелия',author:'Аноним',year:'~175 н.э.'}]},{title:'Архитектура',authors:['Аполлодор Дамасский'],works:[{name:'Пантеон',author:'Адриан (заказчик)',year:'118–128 н.э.'},{name:'Колизей',author:'Аноним',year:'72–80 н.э.'},{name:'Акведук Пон-дю-Гар',author:'Аноним',year:'~19 до н.э.'}]}]},
+  {era:'era-late-antique',name:'Византия',dates:'IV–XV вв.',tag:'Иконопись · Мозаика · Архитектура',themes:['богословие','золотой фон','вечность','догмат','свет'],desc:'Золотой фон, иерархический масштаб, неподвижный взгляд в вечность. Византийское искусство — богословие в образах: каждая деталь — догмат, каждый цвет — символ. Икона — не картина, а «окно в иной мир», написанное по строгому канону.',
+   disciplines:[{title:'Живопись / Иконопись',authors:['Андрей Рублёв','Феофан Грек'],works:[{name:'Троица',author:'Андрей Рублёв',year:'~1411'},{name:'Мозаики Равенны',author:'Аноним',year:'VI в.'},{name:'Деисус (Айя-София)',author:'Аноним',year:'XIII в.'}]},{title:'Архитектура',authors:['Анфимий Тралльский','Исидор Милетский'],works:[{name:'Собор Святой Софии',author:'Анфимий и Исидор',year:'537'},{name:'Базилика Сан-Витале',author:'Аноним',year:'547'},{name:'Собор Святого Марка',author:'Аноним',year:'1063–1094'}]}]},
+  {era:'era-high-medieval',name:'Романский стиль',dates:'XI — нач. XIII вв.',tag:'Архитектура · Скульптура · Фреска',themes:['церковь','Страшный суд','паломничество','монастырь','символ'],desc:'Тяжёлые своды, толстые стены, полукруглые арки. Искусство служит церкви — всё подчинено духовному смыслу. Пространство храма — образ небесного Иерусалима.',
+   disciplines:[{title:'Живопись',authors:['Анонимные монастырские мастера'],works:[{name:'Фрески Сан-Клементе-де-Тауль',author:'Мастер Тауля',year:'~1123'},{name:'Апокалипсис Беата',author:'Аноним',year:'~975'},{name:'Гобелен из Байё',author:'Аноним',year:'~1070–1080'}]},{title:'Скульптура',authors:['Жильберто','Бенедетто Антелами'],works:[{name:'Тимпан «Страшный суд» (Отён)',author:'Жильберто',year:'~1130'},{name:'«Снятие с Креста» (Парма)',author:'Антелами',year:'1178'},{name:'Капители Сен-Лазар',author:'Жильберто',year:'~1120'}]},{title:'Архитектура',authors:['Анонимные мастера аббатств'],works:[{name:'Собор в Вормсе',author:'Аноним',year:'1130–1181'},{name:'Базилика Сен-Сернен',author:'Аноним',year:'~1080–1120'},{name:'Собор в Дареме',author:'Аноним',year:'1093–1133'}]}]},
+  {era:'era-late-medieval',name:'Готика',dates:'XII–XV вв.',tag:'Архитектура · Витраж · Скульптура',themes:['свет','небо','вертикаль','собор','витраж','мистика'],desc:'Устремлённость ввысь, свет сквозь витражи, ажурная каменная резьба. Готика превратила соборы в каменные энциклопедии христианского мироздания. Стрельчатые арки, нервюрные своды, контрфорсы — всё это позволило сделать стены тонкими. Свет стал богословским аргументом.',
+   disciplines:[{title:'Живопись / Витраж',authors:['Симоне Мартини','Дуччо ди Буонинсенья'],works:[{name:'Витражи Шартрского собора',author:'Аноним',year:'XII–XIII вв.'},{name:'Благовещение',author:'Симоне Мартини',year:'1333'},{name:'Маэста',author:'Дуччо',year:'1308–1311'}]},{title:'Скульптура',authors:['Анонимные мастера Реймса, Шартра'],works:[{name:'Улыбающийся ангел (Реймс)',author:'Аноним',year:'~1250'},{name:'Портал Королей (Шартр)',author:'Аноним',year:'~1145'},{name:'Надгробие Элеоноры Аквитанской',author:'Аноним',year:'~1210'}]},{title:'Архитектура',authors:['Сугерий (Сен-Дени)','Жан де Шель'],works:[{name:'Нотр-Дам де Пари',author:'Жан де Шель и др.',year:'1163–1345'},{name:'Шартрский собор',author:'Аноним',year:'1194–1220'},{name:'Сент-Шапель',author:'Пьер де Монтрёй',year:'1248'}]}]},
+  {era:'era-late-medieval',name:'Проторенессанс',dates:'XIII–XIV вв.',tag:'Живопись · Скульптура',themes:['объём','пространство','эмоция','гуманизм','природа'],desc:'Переходный момент: фигуры обретают объём, появляется пространство, возникает эмоция. Ещё средневековое по духу, но уже новое по взгляду. «До Джотто и после Джотто» — так делит историю западной живописи традиция.',
+   disciplines:[{title:'Живопись',authors:['Джотто ди Бондоне','Чимабуэ','Дуччо ди Буонинсенья'],works:[{name:'Фрески капеллы Скровеньи',author:'Джотто',year:'1304–1306'},{name:'Маэста Чимабуэ',author:'Чимабуэ',year:'~1280–1290'},{name:'Оплакивание Христа',author:'Джотто',year:'1304–1306'}]},{title:'Скульптура',authors:['Никола Пизано','Джованни Пизано'],works:[{name:'Кафедра баптистерия (Пиза)',author:'Никола Пизано',year:'1260'},{name:'Надгробие кардинала де Брей',author:'Арнольдо ди Камбио',year:'~1282'},{name:'Распятие с кафедры Св. Андреаса',author:'Джованни Пизано',year:'~1301'}]}]},
+  {era:'era-late-medieval',name:'Раннее Возрождение',dates:'1400–1490 гг.',tag:'Живопись · Скульптура · Архитектура',themes:['перспектива','гуманизм','античность','флоренция','свет'],desc:'Флоренция — колыбель Возрождения. Открытие линейной перспективы (Брунеллески, 1413) переворачивает живопись. Донателло создаёт первую со времён Античности отдельно стоящую обнажённую статую. Боттичелли синтезирует языческую мифологию с христианской чувственностью.',
+   disciplines:[{title:'Живопись',authors:['Мазаччо','Фра Анджелико','Сандро Боттичелли','Пьеро делла Франческа'],works:[{name:'Рождение Венеры',author:'Боттичелли',year:'~1485'},{name:'Весна',author:'Боттичелли',year:'~1482'},{name:'Благовещение',author:'Фра Анджелико',year:'1440–1445'}]},{title:'Скульптура',authors:['Донателло','Лоренцо Гиберти','Лука делла Роббиа'],works:[{name:'Врата Рая',author:'Гиберти',year:'1425–1452'},{name:'Давид (бронза)',author:'Донателло',year:'1440-е'},{name:'Святой Георгий',author:'Донателло',year:'1415–1417'}]},{title:'Архитектура',authors:['Филиппо Брунеллески','Леон Баттиста Альберти'],works:[{name:'Купол Флорентийского собора',author:'Брунеллески',year:'1420–1436'},{name:'Воспитательный дом (Флоренция)',author:'Брунеллески',year:'1419–1445'},{name:'Базилика Сан-Андреа',author:'Альберти',year:'1472'}]}]},
+  {era:'era-high-ren',name:'Высокое Возрождение',dates:'1490–1527 гг.',tag:'Живопись · Скульптура · Архитектура',themes:['совершенство','гармония','универсальный человек','монументальность','синтез'],desc:'Короткое ослепительное тридцатилетие. Леонардо, Микеланджело и Рафаэль работают одновременно в Риме и Флоренции. Искусство достигает такого совершенства, что следующему поколению остаётся лишь усложнять и экспериментировать.',
+   disciplines:[{title:'Живопись',authors:['Леонардо да Винчи','Микеланджело','Рафаэль Санти'],works:[{name:'Тайная вечеря',author:'Леонардо',year:'1495–1498'},{name:'Сикстинская капелла',author:'Микеланджело',year:'1508–1512'},{name:'Сикстинская мадонна',author:'Рафаэль',year:'1512'}]},{title:'Скульптура',authors:['Микеланджело'],works:[{name:'Давид',author:'Микеланджело',year:'1501–1504'},{name:'Пьета',author:'Микеланджело',year:'1498–1499'},{name:'Моисей',author:'Микеланджело',year:'1513–1515'}]},{title:'Архитектура',authors:['Донато Браманте','Микеланджело'],works:[{name:'Темпьетто',author:'Браманте',year:'1502'},{name:'Проект собора Св. Петра',author:'Браманте / Микеланджело',year:'1506–1564'},{name:'Библиотека Лауренциана',author:'Микеланджело',year:'1524'}]}]},
+  {era:'era-late-ren',name:'Позднее Возрождение',dates:'1527–1580 гг.',tag:'Живопись · Архитектура',themes:['цвет','венецианская школа','колорит','свет','театральность'],desc:'После Разграбления Рима (1527) центр тяжести смещается в Венецию. Тициан, Веронезе, Тинторетто открывают цвет как главное выразительное средство. Палладио создаёт архитектурный язык, на котором будут говорить ещё 300 лет.',
+   disciplines:[{title:'Живопись',authors:['Тициан Вечеллио','Паоло Веронезе','Якопо Тинторетто'],works:[{name:'Венера Урбинская',author:'Тициан',year:'1538'},{name:'Пир в доме Левия',author:'Веронезе',year:'1573'},{name:'Чудо святого Марка',author:'Тинторетто',year:'1548'}]},{title:'Архитектура',authors:['Андреа Палладио','Якопо Сансовино'],works:[{name:'Вилла Ротонда',author:'Палладио',year:'1566–1591'},{name:'Базилика Палладиана',author:'Палладио',year:'1549'},{name:'Библиотека Марчиана',author:'Сансовино',year:'1537–1588'}]}]},
+  {era:'era-late-ren',name:'Маньеризм',dates:'1520–1580-е гг.',tag:'Живопись · Скульптура',themes:['элегантность','напряжение','искусственность','изощрённость','кризис'],desc:'Искусственность вместо природности, напряжённость вместо гармонии. Элегантный кризис идеала — изощрённая игра с правилами Ренессанса. Вытянутые фигуры, сложные позы (figura serpentinata), холодные искусственные цвета.',
+   disciplines:[{title:'Живопись',authors:['Понтормо','Пармиджанино','Эль Греко','Бронзино','Тинторетто'],works:[{name:'Снятие с Креста',author:'Понтормо',year:'1525–1528'},{name:'Мадонна с длинной шеей',author:'Пармиджанино',year:'1534–1540'},{name:'Погребение графа Оргаса',author:'Эль Греко',year:'1586–1588'}]},{title:'Скульптура',authors:['Джамболонья','Бенвенуто Челлини'],works:[{name:'Похищение сабинянок',author:'Джамболонья',year:'1574–1582'},{name:'Персей с головой Медузы',author:'Челлини',year:'1545–1554'},{name:'Меркурий',author:'Джамболонья',year:'1580'}]}]},
+  {era:'era-early-modern',name:'Классицизм',dates:'XVII–XVIII вв.',tag:'Живопись · Архитектура',themes:['разум','порядок','античность','государство','симметрия','добродетель'],desc:'Разум, порядок, античный образец. Классицизм возникает как реакция на эмоциональные излишества барокко — строгость формы, ясность композиции, благородная простота. Версаль как манифест абсолютной симметрии и порядка.',
+   disciplines:[{title:'Живопись',authors:['Никола Пуссен','Клод Лоррен','Шарль Лебрен'],works:[{name:'Аркадские пастухи',author:'Пуссен',year:'~1637–1638'},{name:'Похищение сабинянок (Пуссен)',author:'Пуссен',year:'1634–1635'},{name:'Пейзаж с Энеем на Делосе',author:'Лоррен',year:'1672'}]},{title:'Архитектура',authors:['Жюль Ардуэн-Мансар','Андреа Палладио'],works:[{name:'Версальский дворец',author:'Мансар',year:'1678–1710'},{name:'Вилла Ротонда',author:'Палладио',year:'1566–1591'},{name:'Дом инвалидов (купол)',author:'Мансар',year:'1675–1706'}]}]},
+  {era:'era-early-modern',name:'Барокко',dates:'1600–1750 гг.',tag:'Живопись · Скульптура · Архитектура',themes:['движение','свет и тень','страсть','театральность','кьяроскуро','абсолютизм'],desc:'Движение, страсть, драматический свет и тень. Барокко — искусство убеждения, инструмент католической церкви и абсолютных монархий. Бернини создал новый тип ансамбля, где мрамор, бронза, свет и архитектура образуют единое театральное целое.',
+   disciplines:[{title:'Живопись',authors:['Микеланджело да Караваджо','Питер Пауль Рубенс','Рембрандт ван Рейн','Диего Веласкес','Ян Вермер'],works:[{name:'Призвание апостола Матфея',author:'Караваджо',year:'1599–1600'},{name:'Ночной дозор',author:'Рембрандт',year:'1642'},{name:'Менины',author:'Веласкес',year:'1656'}]},{title:'Скульптура',authors:['Джан Лоренцо Бернини'],works:[{name:'Экстаз Святой Терезы',author:'Бернини',year:'1647–1652'},{name:'Аполлон и Дафна',author:'Бернини',year:'1622–1625'},{name:'Давид',author:'Бернини',year:'1623–1624'}]},{title:'Архитектура',authors:['Бернини','Борромини','Кристофер Рен'],works:[{name:'Площадь Собора Св. Петра',author:'Бернини',year:'1656–1667'},{name:'Сан-Карло алле Кватро Фонтане',author:'Борромини',year:'1638–1641'},{name:'Собор Святого Павла (Лондон)',author:'Рен',year:'1675–1710'}]}]},
+  {era:'era-early-modern',name:'Рококо',dates:'1710–1780-е гг.',tag:'Живопись · Декоративное искусство',themes:['галантность','удовольствие','пастораль','аристократия','орнамент','лёгкость'],desc:'Пастельные тона, игривые сюжеты, лёгкость и изящество. Рококо — искусство французской аристократии, последнее беспечное мгновение перед революцией. Декоративность и гедонизм: галантные сцены, мифологические пасторали, будуары.',
+   disciplines:[{title:'Живопись',authors:['Антуан Ватто','Франсуа Буше','Жан-Оноре Фрагонар','Тьеполо'],works:[{name:'Паломничество на остров Киферу',author:'Ватто',year:'1717'},{name:'Качели',author:'Фрагонар',year:'1767'},{name:'Диана после охоты',author:'Буше',year:'1745'}]},{title:'Архитектура / Интерьер',authors:['Жермен Боффран','Жозеф Эффнер'],works:[{name:'Салон принцессы (Отель Субиз)',author:'Боффран',year:'1735–1740'},{name:'Дворец Амалиенбург',author:'Эффнер',year:'1734–1739'},{name:'Дворец Сан-Суси (Потсдам)',author:'Кнобельсдорф',year:'1745–1747'}]}]},
+  {era:'era-early-modern',name:'Неоклассицизм',dates:'1750–1850 гг.',tag:'Живопись · Скульптура · Архитектура',themes:['античность','разум','добродетель','гражданин','Рим','Просвещение'],desc:'Возврат к античным идеалам ясности и разума. Строгие линии, гражданская добродетель, героические сюжеты — ответ Просвещения на лёгкое рококо. Раскопки Помпеи и Геркуланума (с 1748) дали мощный импульс. «Клятва Горациев» Давида (1784) стала манифестом стиля.',
+   disciplines:[{title:'Живопись',authors:['Жак-Луи Давид','Жан-Огюст-Доминик Энгр','Антон Рафаэль Менгс'],works:[{name:'Клятва Горациев',author:'Давид',year:'1784'},{name:'Смерть Сократа',author:'Давид',year:'1787'},{name:'Большая одалиска',author:'Энгр',year:'1814'}]},{title:'Скульптура',authors:['Антонио Канова','Бертель Торвальдсен','Жан-Антуан Гудон'],works:[{name:'Психея, разбуженная Амуром',author:'Канова',year:'1793'},{name:'Ганимед кормящий орла',author:'Торвальдсен',year:'1817'},{name:'Бюст Вольтера',author:'Гудон',year:'1778'}]},{title:'Архитектура',authors:['Жак-Жермен Суффло','Карл Лангганс','Бенджамин Латроб'],works:[{name:'Пантеон (Париж)',author:'Суффло',year:'1758–1790'},{name:'Бранденбургские ворота',author:'Лангганс',year:'1788–1791'},{name:'Белый дом',author:'Хобан / Латроб',year:'1792–1800'}]}]},
+  {era:'era-xix',name:'Романтизм',dates:'1790–1850 гг.',tag:'Живопись · Скульптура',themes:['эмоция','природа','свобода','меланхолия','трагедия','одиночество','стихия'],desc:'Эмоция против разума, природа против цивилизации, индивидуум против общества. Романтизм поставил под сомнение просветительский оптимизм. Центральная концепция — возвышенное (sublime): опыт, где красота смешивается с ужасом.',
+   disciplines:[{title:'Живопись',authors:['Эжен Делакруа','Каспар Давид Фридрих','Уильям Тёрнер','Теодор Жерико','Франсиско Гойя'],works:[{name:'Свобода, ведущая народ',author:'Делакруа',year:'1830'},{name:'Странник над морем тумана',author:'Фридрих',year:'~1818'},{name:'Плот «Медузы»',author:'Жерико',year:'1818–1819'}]},{title:'Скульптура',authors:['Франсуа Рюд','Антуан-Луи Бари'],works:[{name:'Марсельеза (Триумфальная арка)',author:'Рюд',year:'1833–1836'},{name:'Лев, пожирающий змею',author:'Бари',year:'1832'},{name:'Тезей и Минотавр',author:'Бари',year:'1843'}]}]},
+  {era:'era-xix',name:'Реализм',dates:'1840–1880 гг.',tag:'Живопись · Скульптура',themes:['труд','бедность','правда','социальная критика','деревня'],desc:'Крестьяне, рабочие, обычная жизнь — без идеализации. Первое искусство, сознательно обратившееся к социальной критике. В 1855 году Курбе выставил работы отдельно от Салона, назвав выставку «Реализм» — первый художественный жест как политический акт.',
+   disciplines:[{title:'Живопись',authors:['Гюстав Курбе','Жан-Франсуа Милле','Оноре Домье','Илья Репин','Василий Перов'],works:[{name:'Дробильщики камня',author:'Курбе',year:'1849'},{name:'Сборщицы колосьев',author:'Милле',year:'1857'},{name:'Бурлаки на Волге',author:'Репин',year:'1870–1873'}]},{title:'Скульптура',authors:['Констан Менье','Огюст Роден (ранний)'],works:[{name:'Грузчик',author:'Менье',year:'~1885'},{name:'Пудлинговщик',author:'Менье',year:'1886'},{name:'Человек со сломанным носом',author:'Роден',year:'1863–1864'}]}]},
+  {era:'era-xix',name:'Натурализм',dates:'1860–1890 гг.',tag:'Живопись',themes:['объективность','среда','наука','документ','факт','пленэр'],desc:'Крайняя форма реализма: объективность, научный взгляд, среда формирует человека. Тщательная передача поверхности, материи, освещения без романтизации. Натурализм питается позитивистской философией — верой в науку и факт.',
+   disciplines:[{title:'Живопись',authors:['Жюль Бастьен-Лепаж','Макс Либерман','Адольф фон Менцель'],works:[{name:'Картофельный урожай',author:'Бастьен-Лепаж',year:'1878'},{name:'Деревенские работницы',author:'Либерман',year:'1882'},{name:'Железопрокатный завод',author:'Менцель',year:'1875'}]}]},
+  {era:'era-xix',name:'Импрессионизм',dates:'1860–1890 гг.',tag:'Живопись',themes:['свет','мгновение','пленэр','цвет','атмосфера','движение'],desc:'Мгновение, свет, атмосфера. Импрессионисты отказались от студийного «финиша» ради живого ощущения. В 1874 году отвергнутые Салоном художники организовали собственную выставку. Критик насмешливо назвал движение по картине Моне «Impression, soleil levant» — и дал имя навсегда.',
+   disciplines:[{title:'Живопись',authors:['Клод Моне','Пьер-Огюст Ренуар','Эдгар Дега','Камиль Писсарро','Берта Моризо'],works:[{name:'Impression, soleil levant',author:'Клод Моне',year:'1872'},{name:'Мулен де ла Галетт',author:'Ренуар',year:'1876'},{name:'Танцовщицы у станка',author:'Дега',year:'1878'}]}]},
+  {era:'era-xix',name:'Постимпрессионизм',dates:'1880–1910 гг.',tag:'Живопись',themes:['структура','цвет','эмоция','символ','экспрессия','личность'],desc:'Не стиль, а поколение. Художники, вышедшие из импрессионизма, но пришедшие к совершенно разным выводам. Сезанн — путь к кубизму. Ван Гог — к экспрессионизму. Гоген — к фовизму. Сёра — к пуантилизму.',
+   disciplines:[{title:'Живопись',authors:['Поль Сезанн','Винсент ван Гог','Поль Гоген','Жорж Сёра'],works:[{name:'Звёздная ночь',author:'Ван Гог',year:'1889'},{name:'Большие купальщицы',author:'Сезанн',year:'1894–1905'},{name:'Откуда мы пришли? Кто мы?',author:'Гоген',year:'1897'}]}]},
+  {era:'era-xix',name:'Пуантилизм (Дивизионизм)',dates:'1884–1910 гг.',tag:'Живопись',themes:['точка','оптика','наука','цвет','система','свет'],desc:'Картина из точек. Раздельные мазки чистого цвета смешиваются в глазу зрителя — научный принцип оптического смешения как художественный метод. Сёра опирался на теории Шевреля о восприятии цвета.',
+   disciplines:[{title:'Живопись',authors:['Жорж Сёра','Поль Синьяк','Анри Кросс'],works:[{name:'Воскресный день на Гранд-Жатт',author:'Сёра',year:'1884–1886'},{name:'Вход в бухту Марселя',author:'Синьяк',year:'1911'},{name:'Побережье Прованса',author:'Кросс',year:'~1900'}]}]},
+  {era:'era-xix',name:'Символизм',dates:'1880–1910 гг.',tag:'Живопись',themes:['мечта','миф','смерть','эрос','тайна','декаданс'],desc:'Мечта, миф, смерть, эрос. Символизм уходит от видимого мира к скрытым смыслам — искусство как путь к непознаваемому. Прежде всего литературное движение (Бодлер, Малларме, Верлен) — в живописи ищет эквивалент поэтической суггестивности.',
+   disciplines:[{title:'Живопись',authors:['Гюстав Моро','Одилон Редон','Густав Климт','Эдвард Мунк'],works:[{name:'Явление',author:'Моро',year:'~1876'},{name:'Циклоп',author:'Редон',year:'~1898–1900'},{name:'Крик',author:'Мунк',year:'1893'}]}]},
+  {era:'era-xix',name:'Модерн / Ар нуво',dates:'1890–1910 гг.',tag:'Архитектура · Графика · Декор',themes:['органика','линия','орнамент','синтез искусств','природа','текучесть'],desc:'Органические формы, линия как главный элемент, синтез всех искусств. Модерн стремился превратить повседневность в произведение искусства. Gesamtkunstwerk — идея тотального произведения, в котором нет иерархии жанров.',
+   disciplines:[{title:'Живопись / Графика',authors:['Густав Климт','Альфонс Муха','Обри Бёрдсли'],works:[{name:'Поцелуй',author:'Климт',year:'1907–1908'},{name:'Юдифь I',author:'Климт',year:'1901'},{name:'Плакат «Жизмонда»',author:'Муха',year:'1894'}]},{title:'Архитектура',authors:['Антони Гауди','Виктор Орта','Эктор Гимар'],works:[{name:'Дом Бальо',author:'Гауди',year:'1904–1906'},{name:'Особняк Тасселя',author:'Орта',year:'1892–1893'},{name:'Вход в метро (Париж)',author:'Гимар',year:'1900'}]}]},
+  {era:'era-xx-early',name:'Фовизм',dates:'1905–1910 гг.',tag:'Живопись',themes:['цвет','радость','дикость','свобода','интенсивность'],desc:'«Дикие звери» — так критик назвал группу художников на Салоне 1905 года. Матисс и Дерен писали деревья синими, небо жёлтым — не потому что видели так, а потому что чувствовали. Цвет стал самостоятельной ценностью.',
+   disciplines:[{title:'Живопись',authors:['Анри Матисс','Андре Дерен','Морис Вламинк','Рауль Дюфи'],works:[{name:'Танец',author:'Матисс',year:'1909–1910'},{name:'Радость жизни',author:'Матисс',year:'1905–1906'},{name:'Лондонский мост',author:'Дерен',year:'1906'}]}]},
+  {era:'era-xx-early',name:'Экспрессионизм',dates:'1905–1930 гг.',tag:'Живопись · Графика',themes:['тревога','деформация','город','страдание','крик','психика'],desc:'Внутреннее состояние важнее внешнего сходства. Деформация, яркий цвет, тревога — экспрессионизм делает видимым то, что нельзя сфотографировать. «Мост» (1905) — городская тревога и примитивизм. «Синий всадник» (1911) — духовный поиск.',
+   disciplines:[{title:'Живопись',authors:['Эрнст Людвиг Кирхнер','Эгон Шиле','Оскар Кокошка','Макс Бекман','Эмиль Нольде'],works:[{name:'Уличная сцена в Берлине',author:'Кирхнер',year:'1913'},{name:'Автопортрет с поднятым локтем',author:'Шиле',year:'1914'},{name:'Невеста ветра',author:'Кокошка',year:'1913–1914'}]},{title:'Архитектура',authors:['Эрих Мендельсон','Ханс Пёльциг'],works:[{name:'Башня Эйнштейна (Потсдам)',author:'Мендельсон',year:'1924'},{name:'Большой драматический театр (Берлин)',author:'Пёльциг',year:'1919'},{name:'Фабрика шляп (Люккенвальде)',author:'Мендельсон',year:'1921–1923'}]}]},
+  {era:'era-xx-early',name:'Кубизм',dates:'1907–1920-е гг.',tag:'Живопись · Скульптура',themes:['точка зрения','фрагмент','геометрия','одновременность','коллаж'],desc:'Разрушение единой точки зрения: предмет показан одновременно с нескольких сторон. Самая радикальная реформа изображения со времён Ренессанса. «Авиньонские девицы» (1907) — точка отсчёта.',
+   disciplines:[{title:'Живопись',authors:['Пабло Пикассо','Жорж Брак','Фернан Леже','Хуан Грис'],works:[{name:'Авиньонские девицы',author:'Пикассо',year:'1907'},{name:'Скрипка и подсвечник',author:'Брак',year:'1910'},{name:'Завтрак',author:'Хуан Грис',year:'1914'}]},{title:'Скульптура',authors:['Александр Архипенко','Жак Липшиц'],works:[{name:'Женщина, расчёсывающая волосы',author:'Архипенко',year:'1915'},{name:'Матрос',author:'Липшиц',year:'1914'},{name:'Формы пространства',author:'Архипенко',year:'1913'}]}]},
+  {era:'era-xx-early',name:'Футуризм',dates:'1909–1920-е гг.',tag:'Живопись · Скульптура',themes:['скорость','машина','движение','война','молодость','динамика'],desc:'Скорость, машины, насилие, молодость — итальянские футуристы провозгласили разрыв с прошлым. «Мчащийся автомобиль прекраснее Ники Самофракийской» — Маринетти, 1909.',
+   disciplines:[{title:'Живопись',authors:['Умберто Боччони','Джакомо Балла','Карло Карра','Джино Северини'],works:[{name:'Город встаёт',author:'Боччони',year:'1910–1911'},{name:'Динамизм собаки на поводке',author:'Балла',year:'1912'},{name:'Похороны анархиста Галли',author:'Карра',year:'1910–1911'}]},{title:'Скульптура',authors:['Умберто Боччони'],works:[{name:'Уникальные формы непрерывности в пространстве',author:'Боччони',year:'1913'},{name:'Развитие бутылки в пространстве',author:'Боччони',year:'1912'},{name:'Антиграсия',author:'Боччони',year:'1913'}]}]},
+  {era:'era-xx-early',name:'Русский авангард',dates:'1910–1930 гг.',tag:'Живопись · Дизайн · Архитектура',themes:['революция','утопия','конструкция','геометрия','коллектив','будущее'],desc:'Революция в искусстве и в обществе — одновременно и неразрывно. Малевич, Татлин, Родченко, Лисицкий — они работали во всех областях сразу. Тотальный эстетический проект переустройства мира.',
+   disciplines:[{title:'Живопись',authors:['Казимир Малевич','Наталья Гончарова','Михаил Ларионов','Любовь Попова'],works:[{name:'Чёрный квадрат',author:'Малевич',year:'1915'},{name:'Велосипедист',author:'Гончарова',year:'1913'},{name:'Живописная архитектоника',author:'Попова',year:'1918'}]},{title:'Дизайн / Объект',authors:['Александр Родченко','Эль Лисицкий','Владимир Татлин'],works:[{name:'Башня III Интернационала (проект)',author:'Татлин',year:'1919–1920'},{name:'Проуны',author:'Лисицкий',year:'1920–1923'},{name:'Плакат «Книги»',author:'Родченко',year:'1924'}]}]},
+  {era:'era-xx-early',name:'Абстракционизм',dates:'1910–1940 гг.',tag:'Живопись · Скульптура',themes:['чистая форма','цвет','музыка','духовность','беспредметность'],desc:'Отказ от изображения реального мира. Цвет, форма и линия существуют сами по себе. Кандинский в 1910–1913 годах создал первые признанные абстрактные полотна — цвет и форма имеют собственное «звучание», аналогичное музыке.',
+   disciplines:[{title:'Живопись',authors:['Василий Кандинский','Пит Мондриан','Франтишек Купка','Пауль Клее'],works:[{name:'Композиция VIII',author:'Кандинский',year:'1923'},{name:'Композиция II в красном, синем и жёлтом',author:'Мондриан',year:'1930'},{name:'Фуга в красном',author:'Клее',year:'1921'}]},{title:'Скульптура',authors:['Константин Бранкузи','Наум Габо'],works:[{name:'Птица в пространстве',author:'Бранкузи',year:'1928'},{name:'Конструкция в пространстве',author:'Габо',year:'1929'},{name:'Спящая муза',author:'Бранкузи',year:'1910'}]}]},
+  {era:'era-xx-early',name:'Супрематизм',dates:'1915–1920-е гг.',tag:'Живопись',themes:['геометрия','белое','квадрат','беспредметность','нулевая точка'],desc:'Геометрические формы на белом фоне. Малевич довёл абстракцию до предела: «Чёрный квадрат» (1915) — нулевая точка живописи. Квадрат, круг, крест — первичные формы, не отсылающие ни к чему в мире.',
+   disciplines:[{title:'Живопись',authors:['Казимир Малевич','Ольга Розанова','Надежда Удальцова'],works:[{name:'Чёрный квадрат',author:'Малевич',year:'1915'},{name:'Белое на белом',author:'Малевич',year:'1918'},{name:'Аэроплан в полёте',author:'Малевич',year:'1915'}]}]},
+  {era:'era-xx-early',name:'Конструктивизм',dates:'1920–1930-е гг.',tag:'Дизайн · Архитектура · Плакат',themes:['функция','конструкция','производство','революция','типографика'],desc:'Искусство на службе революции. Не созерцание, а конструирование — художник как инженер нового общества. Советский плакат 1920-х — вершина конструктивизма и один из великих периодов графического дизайна.',
+   disciplines:[{title:'Живопись / Графика',authors:['Александр Родченко','Эль Лисицкий','Варвара Степанова'],works:[{name:'Плакат «Книги»',author:'Родченко',year:'1924'},{name:'«Клином красным бей белых»',author:'Лисицкий',year:'1919'},{name:'Обложки журнала «ЛЕФ»',author:'Родченко',year:'1923–1925'}]},{title:'Архитектура',authors:['Константин Мельников','братья Веснины','Моисей Гинзбург'],works:[{name:'Клуб Русакова (Москва)',author:'Мельников',year:'1927–1929'},{name:'Собственный дом Мельникова',author:'Мельников',year:'1927–1929'},{name:'Дом Наркомфина',author:'Гинзбург',year:'1928–1930'}]}]},
+  {era:'era-xx-early',name:'Дадаизм',dates:'1916–1920-е гг.',tag:'Коллаж · Перформанс · Объект',themes:['абсурд','провокация','война','деструкция','ирония','антиискусство'],desc:'Бессмыслица как смысл. Дада — реакция на ужас Первой мировой. Дюшан выставил писсуар как скульптуру («Фонтан», 1917) — что делает предмет произведением искусства? Дада поставил вопросы, на которые концептуализм отвечал весь XX век.',
+   disciplines:[{title:'Живопись / Коллаж',authors:['Ханна Хёх','Курт Швиттерс','Макс Эрнст','Жан Арп'],works:[{name:'Срез кухонным ножом',author:'Хёх',year:'1919'},{name:'Мерц-конструкция',author:'Швиттерс',year:'1920-е'},{name:'Слон Целебес',author:'Эрнст',year:'1921'}]},{title:'Объект / Реди-мейд',authors:['Марсель Дюшан','Ман Рэй'],works:[{name:'Фонтан',author:'Дюшан',year:'1917'},{name:'L.H.O.O.Q.',author:'Дюшан',year:'1919'},{name:'Подарок (утюг с гвоздями)',author:'Ман Рэй',year:'1921'}]}]},
+  {era:'era-xx-early',name:'Сюрреализм',dates:'1924–1940-е гг.',tag:'Живопись · Кино · Объект',themes:['сон','бессознательное','эрос','абсурд','страх','автоматизм','Фрейд'],desc:'Бессознательное как источник творчества. Сон и явь, логика и абсурд — сюрреализм вооружился психоанализом и объявил войну рациональному контролю. Два пути: автоматическое рисование и точная «фотографическая» запись сновидений.',
+   disciplines:[{title:'Живопись',authors:['Сальвадор Дали','Рене Магритт','Макс Эрнст','Хоан Миро','Фрида Кало'],works:[{name:'Постоянство памяти',author:'Дали',year:'1931'},{name:'Это не трубка',author:'Магритт',year:'1929'},{name:'Две Фриды',author:'Кало',year:'1939'}]},{title:'Скульптура / Объект',authors:['Альберто Джакометти','Мерет Оппенгейм'],works:[{name:'Дворец в 4 часа ночи',author:'Джакометти',year:'1932'},{name:'Завтрак в мехах',author:'Оппенгейм',year:'1936'},{name:'Висящий шар',author:'Джакометти',year:'1930–1931'}]}]},
+  {era:'era-xx-mid',name:'Соцреализм',dates:'1934–1980-е гг.',tag:'Живопись · Скульптура · Архитектура',themes:['герой','оптимизм','народ','революция','труд','идеология'],desc:'Официальный стиль советского государства с 1934 года: реалистичен по форме, социалистичен по содержанию. Художник — «инженер человеческих душ». Позитивный герой, доступность, историческая неизбежность победы.',
+   disciplines:[{title:'Живопись',authors:['Александр Герасимов','Александр Дейнека','Юрий Пименов','Аркадий Пластов'],works:[{name:'Сталин и Ворошилов в Кремле',author:'Герасимов',year:'1938'},{name:'Оборона Петрограда',author:'Дейнека',year:'1928'},{name:'Новая Москва',author:'Пименов',year:'1937'}]},{title:'Скульптура',authors:['Вера Мухина','Николай Томский'],works:[{name:'Рабочий и колхозница',author:'Мухина',year:'1937'},{name:'Портрет Кирова',author:'Томский',year:'1935'},{name:'Памятник Ленину',author:'Томский',year:'1926'}]},{title:'Архитектура',authors:['Борис Иофан','Алексей Щусев','Лев Руднев'],works:[{name:'Сталинские высотки Москвы',author:'Разные авторы',year:'1947–1957'},{name:'МГУ (главный корпус)',author:'Руднев',year:'1949–1953'},{name:'Мавзолей Ленина',author:'Щусев',year:'1930'}]}]},
+  {era:'era-xx-mid',name:'Абстрактный экспрессионизм',dates:'1945–1960-е гг.',tag:'Живопись',themes:['жест','энергия','экзистенциализм','масштаб','подсознание','свобода'],desc:'Нью-Йорк после войны. Живопись как жест, как экзистенциальный акт. Центр мирового искусства впервые переместился из Парижа в Америку. Поллок разлил краску на холст — жест стал содержанием. Ротко создавал прямоугольники цвета, физически ощущаемые зрителем.',
+   disciplines:[{title:'Живопись',authors:['Джексон Поллок','Марк Ротко','Виллем де Кунинг','Франц Клайн','Ли Краснер'],works:[{name:'Номер 31',author:'Поллок',year:'1950'},{name:'Оранжевое и жёлтое',author:'Ротко',year:'1956'},{name:'Женщина I',author:'де Кунинг',year:'1950–1952'}]}]},
+  {era:'era-xx-mid',name:'Ташизм',dates:'1940–1960-е гг.',tag:'Живопись',themes:['пятно','жест','лирика','интуиция','спонтанность','Европа'],desc:'Европейский ответ на американский абстрактный экспрессионизм. «Ташизм» от французского tache — пятно. Живопись как спонтанный жест, свободный от рациональной композиции. Более лиричен, чем американская «живопись действия».',
+   disciplines:[{title:'Живопись',authors:['Жорж Матьё','Жан Фотрие','Пьер Сулаж','Вольс'],works:[{name:'Батай на Бувин',author:'Матьё',year:'1954'},{name:'Заложники',author:'Фотрие',year:'1945'},{name:'Серия «Нуар»',author:'Сулаж',year:'1950-е'}]}]},
+  {era:'era-xx-mid',name:'Поп-арт',dates:'1955–1970-е гг.',tag:'Живопись · Скульптура · Графика',themes:['потребление','знаменитость','комикс','реклама','серийность','ирония'],desc:'Консервная банка, кинозвезда, комикс — в раме как искусство. Поп-арт стёр границу между высокой культурой и массовым потреблением. Уорхол превратил фабричную серийность в художественный метод.',
+   disciplines:[{title:'Живопись',authors:['Энди Уорхол','Рой Лихтенштейн','Ричард Хэмилтон','Джаспер Джонс'],works:[{name:'Банки с супом Кэмпбелл',author:'Уорхол',year:'1962'},{name:'Диптих Мэрилин',author:'Уорхол',year:'1962'},{name:'Утопленница',author:'Лихтенштейн',year:'1963'}]},{title:'Скульптура / Объект',authors:['Клас Олденбург','Джордж Сигал'],works:[{name:'Мягкий унитаз',author:'Олденбург',year:'1966'},{name:'Гамбургер Флор',author:'Олденбург',year:'1962'},{name:'Автобусные пассажиры',author:'Сигал',year:'1962'}]}]},
+  {era:'era-xx-mid',name:'Минимализм',dates:'1960–1970-е гг.',tag:'Скульптура · Живопись',themes:['пустота','повтор','пространство','объект','серийность','редукция'],desc:'Максимум смысла при минимуме средств. Кубы, плиты, повторяющиеся модули — минимализм избавляет от жеста, авторства, нарратива. Джадд назвал свои работы «специфическими объектами»: они занимают реальное пространство.',
+   disciplines:[{title:'Живопись',authors:['Фрэнк Стелла','Эллсворт Келли','Эд Рейнхардт'],works:[{name:'Чёрные картины (серия)',author:'Стелла',year:'1958–1960'},{name:'Красный синий зелёный',author:'Келли',year:'1963'},{name:'Абстрактная картина',author:'Рейнхардт',year:'1963'}]},{title:'Скульптура',authors:['Дональд Джадд','Дэн Флавин','Карл Андре'],works:[{name:'Специфические объекты (серия)',author:'Джадд',year:'1963–1969'},{name:'Диагональ 25 мая 1963',author:'Флавин',year:'1963'},{name:'Эквивалент VIII',author:'Андре',year:'1966'}]}]},
+  {era:'era-xx-mid',name:'Гиперреализм (Фотореализм)',dates:'1965–1980-е гг.',tag:'Живопись · Скульптура',themes:['иллюзия','копия','фотография','восприятие','детализация','обман'],desc:'Живопись точнее фотографии. Гиперреализм доводит иллюзию до абсурда — и задаёт вопрос о природе реальности. Дуэйн Хэнсон лепил фигуры людей из поливинилхлорида, одевал в реальную одежду и помещал в музеи. Зрители здоровались с ними.',
+   disciplines:[{title:'Живопись',authors:['Чак Клоуз','Ричард Эстес','Одри Флэк','Роберт Бехтл'],works:[{name:'Фил',author:'Чак Клоуз',year:'1969'},{name:'Телефонные будки',author:'Эстес',year:'1967'},{name:'Vanitas',author:'Флэк',year:'1976–1977'}]},{title:'Скульптура',authors:['Дуэйн Хэнсон','Рон Мьюэк'],works:[{name:'Супермаркет-леди',author:'Хэнсон',year:'1969–1970'},{name:'Большой мальчик',author:'Мьюэк',year:'1999'},{name:'Автопортрет с черепом',author:'Мьюэк',year:'2006'}]}]},
+  {era:'era-xx-late',name:'Концептуализм',dates:'1965 — н.в.',tag:'Инсталляция · Перформанс · Текст',themes:['идея','контекст','язык','институция','тело','вопрос'],desc:'Идея важнее исполнения. Физического объекта может не быть вовсе. Кошут выставил стул, его фотографию и словарное определение — «Одна и три стула» (1965). Что из этого искусство? Вопрос и есть работа.',
+   disciplines:[{title:'Объект / Текст',authors:['Джозеф Кошут','Брюс Науман','Sol LeWitt','Лоуренс Вайнер'],works:[{name:'Одна и три стула',author:'Кошут',year:'1965'},{name:'Неоновые инсталляции',author:'Науман',year:'1960–1970-е'},{name:'Настенные рисунки (серия)',author:'Sol LeWitt',year:'1968–2007'}]},{title:'Перформанс / Инсталляция',authors:['Марина Абрамович','Йоко Оно','Христо и Жанна-Клод'],works:[{name:'Ритм 0',author:'Абрамович',year:'1974'},{name:'Грейпфрутовая книга инструкций',author:'Оно',year:'1964'},{name:'Окружённые острова',author:'Христо',year:'1980–1983'}]}]},
+  {era:'era-xx-late',name:'Неоэкспрессионизм',dates:'1970–1980-е гг.',tag:'Живопись',themes:['возвращение живописи','история','травма','тело','миф','интенсивность'],desc:'Возвращение живописи после десятилетий концептуализма. Крупный формат, физическая энергия мазка, фигуративность. Немецкие мастера работали с исторической памятью и национальной травмой. Баскиа соединил стрит-арт и экспрессионизм.',
+   disciplines:[{title:'Живопись',authors:['Георг Базелиц','Ансельм Кифер','Жан-Мишель Баскиа','Франческо Клементе'],works:[{name:'Ohne Titel (перевёрнутая фигура)',author:'Базелиц',year:'1977'},{name:'Маргарет и Марианна фон Браухич',author:'Кифер',year:'1988'},{name:'Без названия',author:'Баскиа',year:'1982'}]}]},
+  {era:'era-xx-late',name:'Постмодернизм',dates:'1970 — н.в.',tag:'Все медиа',themes:['цитата','ирония','симулякр','присвоение','деконструкция','игра'],desc:'Нет единого стиля, нет иерархии, нет прогресса — есть цитирование, ирония, игра с кодами. «Смерть автора» и конец «больших нарративов». Шерри Лавин фотографировала репродукции знаменитых фотографий и выставляла под своим именем.',
+   disciplines:[{title:'Живопись / Фотография',authors:['Синди Шерман','Шерри Лавин','Барбара Крюгер','Джефф Кунс'],works:[{name:'Кинокадры без названия (серия)',author:'Шерман',year:'1977–1980'},{name:'После Уокера Эванса',author:'Лавин',year:'1981'},{name:'Кролик',author:'Кунс',year:'1986'}]},{title:'Архитектура',authors:['Роберт Вентури','Чарльз Мур','Рем Колхас'],works:[{name:'Здание AT&T (Нью-Йорк)',author:'Джонсон/Бёрджи',year:'1984'},{name:'Публичная библиотека Сиэтла',author:'Колхас',year:'2004'},{name:'Музей Гуггенхайма (Бильбао)',author:'Гери',year:'1997'}]}]},
+  {era:'era-xx-late',name:'Стрит-арт / Граффити',dates:'1970 — н.в.',tag:'Городская среда · Мурализм',themes:['улица','город','тег','протест','публичное пространство','анонимность'],desc:'Искусство вне галереи, без разрешения, для всех. От нью-йоркского метро 1970-х до музейных стен. Баскиа начинал с тегов SAMO© на Манхэттене. Бэнкси сделал анонимность художественным жестом.',
+   disciplines:[{title:'Живопись / Мурал',authors:['Жан-Мишель Баскиа (SAMO©)','Кит Харинг','Бэнкси','Шепард Фейри'],works:[{name:'Теги SAMO© (Нью-Йорк)',author:'Баскиа',year:'1977–1980'},{name:'Девочка с шариком',author:'Бэнкси',year:'2002–2004'},{name:'Надежда',author:'Шепард Фейри',year:'2008'}]}]},
+];
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function goStyle(style) {
+  renderStylePage(style);
+  document.getElementById('page-list').classList.add('pushed');
+  document.getElementById('page-style').classList.add('open');
+  document.getElementById('nav-back').style.display = 'flex';
+  document.getElementById('nav-list-links').style.display = 'none';
+  document.getElementById('page-style').scrollTop = 0;
+}
+function goList() {
+  document.getElementById('page-list').classList.remove('pushed');
+  document.getElementById('page-style').classList.remove('open');
+  document.getElementById('nav-back').style.display = 'none';
+  document.getElementById('nav-list-links').style.display = 'flex';
+}
+
+// ─── STYLE PAGE ───────────────────────────────────────────────────────────────
+let lbWorks = [];
+let lbIndex = 0;
+
+function renderStylePage(style) {
+  // build flat works list for lightbox (only works with images)
+  lbWorks = [];
+  style.disciplines.forEach(d => {
+    d.works.forEach(w => {
+      if (IMAGES[w.name]) lbWorks.push({ name: w.name, author: w.author, year: w.year, imgUrl: IMAGES[w.name] });
+    });
+  });
+
+  const container = document.getElementById('sp-content');
+  const themesHtml = style.themes.map(t=>`<span class="sp-theme-chip">${t}</span>`).join('');
+  const discsHtml = style.disciplines.map((d,di)=>{
+    const worksHtml = d.works.map(w=>{
+      const imgUrl = IMAGES[w.name];
+      const lbIdx = lbWorks.findIndex(lw => lw.name === w.name);
+      const clickable = lbIdx !== -1;
+      const imgHtml = imgUrl
+        ? `<img src="${imgUrl}" alt="${w.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:9px;" onerror="this.style.display='none';this.parentNode.querySelector('svg').style.display='block'">`
+        : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>`;
+      return `<div class="sp-gallery-item">
+        <div class="sp-gallery-img${clickable?' has-img':''}" style="overflow:hidden;background:var(--paper-warm);" ${clickable?`onclick="lbOpen(${lbIdx})"`:''}>
+          ${imgHtml}
+          <svg style="display:none;width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
+        </div>
+        <div class="sp-gallery-caption"><strong>${w.name}</strong>${w.author}, ${w.year}</div>
+      </div>`;
+    }).join('');
+    const authorsHtml = d.authors.map(a=>`<div class="sp-list-item">${a}</div>`).join('');
+    return `
+    <div class="sp-disc-section">
+      <div class="sp-disc-header">
+        <div class="sp-disc-title">${d.title}</div>
+        <div class="sp-disc-tabs">
+          <button class="sp-disc-tab active" onclick="switchTab(this,'works',${di})">работы</button>
+          <button class="sp-disc-tab" onclick="switchTab(this,'authors',${di})">авторы</button>
+        </div>
+      </div>
+      <div class="sp-gallery" id="disc-works-${di}">${worksHtml}</div>
+      <div class="sp-list" id="disc-authors-${di}" style="display:none">${authorsHtml}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="sp-layout">
+      <div class="sp-left">
+        <div class="sp-header">
+          <div class="sp-title-row">
+            <h1 class="sp-title">${style.name}</h1>
+            <span class="sp-dash">—</span>
+          </div>
+          <div class="sp-dates">зародился в <strong>${style.dates}</strong></div>
+          <div class="sp-desc-wrap">
+            <div class="sp-desc-text collapsed" id="sp-desc-text">${style.desc}</div>
+            <button class="sp-expand-btn" id="sp-expand-btn" onclick="toggleDesc()">Развернуть...</button>
+          </div>
+        </div>
+        <div class="sp-themes">
+          <div class="sp-themes-label">Ключевые темы:</div>
+          <div class="sp-theme-chips">${themesHtml}</div>
+        </div>
+      </div>
+      <div class="sp-right">
+        <div class="sp-disciplines">${discsHtml}</div>
+      </div>
+    </div>`;
+}
+
+function toggleDesc() {
+  const text = document.getElementById('sp-desc-text');
+  const btn = document.getElementById('sp-expand-btn');
+  const collapsed = text.classList.contains('collapsed');
+  text.classList.toggle('collapsed', !collapsed);
+  text.classList.toggle('expanded', collapsed);
+  btn.textContent = collapsed ? 'Свернуть' : 'Развернуть...';
+}
+function switchTab(btn, type, di) {
+  btn.closest('.sp-disc-header').querySelectorAll('.sp-disc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`disc-works-${di}`).style.display = type==='works'?'flex':'none';
+  document.getElementById(`disc-authors-${di}`).style.display = type==='authors'?'flex':'none';
+}
+
+// ─── LIST BUILD ───────────────────────────────────────────────────────────────
+function buildPanel(style) {
+  const discs = style.disciplines.map(d=>`
+    <div class="panel-disc">
+      <div class="panel-disc-title">${d.title}</div>
+      <div class="panel-disc-row"><span class="panel-disc-label">Авторы</span><span class="panel-disc-val">${d.authors.join(', ')}</span></div>
+      <div class="panel-disc-row"><span class="panel-disc-label">Произведения</span><span class="panel-disc-val"><em>${d.works.map(w=>w.name).join(', ')}</em></span></div>
+    </div>`).join('');
+  const idx = STYLES.indexOf(style);
+  return `
+  <div class="style-panel" id="panel-${idx}">
+    <div class="style-panel-inner">
+      <div class="panel-name">${style.name}</div>
+      <span class="panel-tag">${style.tag}</span>
+      <p class="panel-desc-short">${style.desc.split('.')[0]}.</p>
+      <div class="panel-disciplines">${discs}</div>
+      <button class="btn-more" onclick="goStyle(STYLES[${idx}])">Подробнее
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h8M7 3l3 3-3 3"/></svg>
+      </button>
+    </div>
+  </div>`;
+}
+
+// ─── ARTISTS DATA ─────────────────────────────────────────────────────────────
+const ARTISTS = [
+  {era:'era-ancient',name:'Тутмос',years:'ок. XIV в. до н.э.',born:'Египет',style:'Древний Египет',bio:'Придворный скульптор фараона Эхнатона. Создал один из самых узнаваемых портретов в истории — бюст царицы Нефертити, ставший символом идеала красоты.',works:['Бюст Нефертити']},
+  {era:'era-antiquity',name:'Фидий',years:'ок. 490–430 до н.э.',born:'Афины, Греция',style:'Древняя Греция',bio:'Величайший скульптор Древней Греции, главный мастер эпохи Перикла. Создал статуи Зевса Олимпийского и Афины Парфенос — оба считались чудесами света. Руководил строительством Парфенона.',works:['Статуя Зевса Олимпийского (утрачена)','Афина Парфенос (утрачена)','Фриз Парфенона']},
+  {era:'era-antiquity',name:'Поликлет',years:'ок. 480–420 до н.э.',born:'Аргос, Греция',style:'Древняя Греция',bio:'Скульптор, разработавший «Канон» — математический трактат об идеальных пропорциях тела. Воплотил теорию в «Дорифоре» (Копьеносце) — статуе, ставшей учебным пособием на века.',works:['Дорифор','Диадумен']},
+  {era:'era-antiquity',name:'Пракситель',years:'ок. 400–330 до н.э.',born:'Афины, Греция',style:'Древняя Греция',bio:'Первый скульптор, создавший обнажённую женскую статую — Афродиту Книдскую. Произвёл революцию в искусстве и заложил образец для всей европейской скульптуры.',works:['Афродита Книдская','Гермес с младенцем Дионисом']},
+  {era:'era-late-antique',name:'Эадфрит',years:'ок. 660–721',born:'Нортумбрия, Англия',style:'Инсулярное искусство',bio:'Епископ Линдисфарна и создатель «Евангелия Линдисфарна» — одного из величайших шедевров средневековой иллюминации. Один из немногих ранних средневековых мастеров, чьё имя дошло до нас.',works:['Евангелие Линдисфарна']},
+  {era:'era-late-antique',name:'Феофан Исповедник',years:'ок. 758–817',born:'Константинополь, Византия',style:'Византийское искусство',bio:'Монах и летописец, один из хранителей иконопочитания в период иконоборчества. Символ сопротивления уничтожению образов — его труды помогли сохранить традицию священного изображения для последующих веков.',works:['Хроника Феофана','Мозаики монастыря Студиос']},
+  {era:'era-high-medieval',name:'Жильберто',years:'акт. ок. 1120–1135',born:'Франция (предположительно)',style:'Романский стиль',bio:'Один из немногих романских скульпторов, подписавших своё произведение: «Gislebertus hoc fecit» — «Жильберто это сделал». Создал 76 рельефных капителей собора Отёна — каменную энциклопедию христианского мира.',works:['Тимпан «Страшный суд» (Отён)','Капители собора Сент-Лазар']},
+  {era:'era-high-medieval',name:'Бернвард Хильдесхаймский',years:'ок. 960–1022',born:'Германия',style:'Оттоновское искусство',bio:'Епископ, художник, архитектор и ювелир в одном лице. Создал знаменитые бронзовые двери собора Святого Михаила (1015) — шедевр раннесредневековой пластики. Канонизирован в 1192 году.',works:['Бронзовые двери собора Св. Михаила в Хильдесхайме','Колонна Бернварда']},
+  {era:'era-late-antique',name:'Феофан Грек',years:'ок. 1340–1410',born:'Византийская империя',style:'Поздневизантийское / Иконопись',bio:'Выдающийся живописец, работавший сначала в Константинополе, затем на Руси. Известен экспрессивными аскетическими образами с динамичными белыми бликами. Работал вместе с молодым Андреем Рублёвым.',works:['Фрески церкви Спаса Преображения (Новгород)','Деисусный чин Благовещенского собора']},
+  {era:'era-late-antique',name:'Андрей Рублёв',years:'ок. 1360–1428',born:'Россия',style:'Иконопись',bio:'Крупнейший русский иконописец. Его «Троица» считается вершиной православной иконописи и одним из величайших произведений мирового религиозного искусства. Канонизирован в 1988 году.',works:['Троица','Иконостас Успенского собора во Владимире']},
+  {era:'era-late-medieval',name:'Чимабуэ',years:'ок. 1240–1302',born:'Флоренция, Италия',style:'Проторенессанс',bio:'«Отец итальянской живописи». Первым начал отходить от строгого византийского канона — придавал фигурам объём и человечность. Учитель Джотто.',works:['Маэста Чимабуэ','Распятие (Санта-Кроче)']},
+  {era:'era-late-medieval',name:'Джотто ди Бондоне',years:'ок. 1267–1337',born:'Флоренция, Италия',style:'Проторенессанс',bio:'Революционер западной живописи. Впервые изобразил фигуры с реальным объёмом и эмоциями. Фрески капеллы Скровеньи — поворотный момент в истории искусства.',works:['Фрески капеллы Скровеньи','Оплакивание Христа']},
+  {era:'era-late-medieval',name:'Дуччо ди Буонинсенья',years:'ок. 1255–1318',born:'Сиена, Италия',style:'Готика / Проторенессанс',bio:'Основатель сиенской школы живописи. Соединил изысканность византийской традиции с нарождающимся вниманием к пространству и человеческой эмоции.',works:['Маэста (Сиенский собор)','Рождество с пророками']},
+  {era:'era-late-medieval',name:'Никола Пизано',years:'ок. 1220–1284',born:'Апулия, Италия',style:'Проторенессанс',bio:'Основоположник итальянской скульптуры. Возродил классическую античную традицию, создав монументальные кафедры с рельефами, полными динамики и объёма.',works:['Кафедра баптистерия в Пизе','Кафедра собора в Сиене']},
+  {era:'era-high-ren',name:'Леонардо да Винчи',years:'1452–1519',born:'Винчи, Италия',style:'Ренессанс',bio:'Воплощение идеала «универсального человека»: живописец, скульптор, архитектор, учёный, инженер. «Тайная вечеря» и «Мона Лиза» — два самых известных произведения в истории искусства.',works:['Тайная вечеря','Мона Лиза','Витрувианский человек']},
+  {era:'era-high-ren',name:'Микеланджело Буонарроти',years:'1475–1564',born:'Капрезе, Италия',style:'Ренессанс',bio:'Гений сразу трёх искусств: скульптуры, живописи и архитектуры. Создал «Давида», расписал Сикстинскую капеллу и спроектировал купол собора Святого Петра.',works:['Давид','Сикстинская капелла','Пьета']},
+  {era:'era-high-ren',name:'Рафаэль Санти',years:'1483–1520',born:'Урбино, Италия',style:'Ренессанс',bio:'Мастер гармонии и совершенной красоты. Создал эталонные образы Мадонны и грандиозные росписи Ватиканских станц. Олицетворение ренессансного идеала прекрасного.',works:['Сикстинская мадонна','Афинская школа','Мадонна Конестабиле']},
+  {era:'era-late-medieval',name:'Сандро Боттичелли',years:'1445–1510',born:'Флоренция, Италия',style:'Ренессанс',bio:'Поэт флорентийского Ренессанса. Его аллегорические полотна, наполненные изяществом и меланхолией, стали иконами эпохи. В старости отрёкся от «языческих» картин под влиянием Савонаролы.',works:['Рождение Венеры','Весна','Поклонение волхвов']},
+  {era:'era-late-medieval',name:'Донателло',years:'1386–1466',born:'Флоренция, Италия',style:'Ренессанс',bio:'Первый великий скульптор Возрождения. Создал первую отдельно стоящую обнажённую бронзовую статую со времён Античности — «Давида». Реформировал рельеф, введя принцип перспективы.',works:['Давид (бронза)','Святой Георгий','Кондотьер Гаттамелата']},
+  {era:'era-late-ren',name:'Тициан Вечеллио',years:'ок. 1488–1576',born:'Пьеве-ди-Кадоре, Италия',style:'Ренессанс',bio:'Властитель цвета венецианской школы. Работал почти до 100 лет, создав около 600 картин. Прославился портретами монархов и религиозными композициями с невероятно богатой цветовой палитрой.',works:['Венера Урбинская','Вознесение Марии','Карл V при Мюльберге']},
+  {era:'era-late-ren',name:'Эль Греко',years:'1541–1614',born:'Крит, Греция',style:'Маньеризм',bio:'Грек, прославившийся в Испании. Вытянутые фигуры, мистический свет, экспрессивная живопись — его стиль предвосхитил экспрессионизм на 300 лет. Настоящее имя — Доменикос Теотокопулос.',works:['Погребение графа Оргаса','Вид Толедо','Снятие с Креста']},
+  {era:'era-early-modern',name:'Микеланджело Меризи да Караваджо',years:'1571–1610',born:'Милан, Италия',style:'Барокко',bio:'Революционер живописи, создавший тенебризм — резкий контраст света и тьмы. Изображал библейских персонажей с неслыханным реализмом, срывая с них ореол недосягаемости.',works:['Призвание апостола Матфея','Юдифь и Олоферн','Давид с головой Голиафа']},
+  {era:'era-early-modern',name:'Питер Пауль Рубенс',years:'1577–1640',born:'Зиген, Германия',style:'Барокко',bio:'Главный живописец северного барокко. Монументальные религиозные и мифологические сцены с торжествующей телесностью и роскошным колоритом. Первый «суперзвёздный» художник в европейском смысле.',works:['Снятие с Креста','Похищение дочерей Левкиппа','Сад любви']},
+  {era:'era-early-modern',name:'Рембрандт ван Рейн',years:'1606–1669',born:'Лейден, Нидерланды',style:'Барокко',bio:'Мастер светотени и психологического портрета. В автопортретах создал беспрецедентную хронику собственной жизни. «Ночной дозор» — вершина группового портрета всех времён.',works:['Ночной дозор','Возвращение блудного сына','Автопортрет (1669)']},
+  {era:'era-early-modern',name:'Ян Вермер',years:'1632–1675',born:'Делфт, Нидерланды',style:'Барокко',bio:'Поэт обыденного момента. Всего около 36 картин — и каждая шедевр. Непревзойдённый мастер передачи рассеянного дневного света и тишины повседневной жизни.',works:['Девушка с жемчужной серёжкой','Молочница','Аллегория живописи']},
+  {era:'era-early-modern',name:'Диего Веласкес',years:'1599–1660',born:'Севилья, Испания',style:'Барокко',bio:'Придворный живописец Филиппа IV. Великий реалист, которым восхищались импрессионисты. «Менины» считается одной из самых загадочных и совершенных картин всех времён.',works:['Менины','Портрет Иннокентия X','Венера с зеркалом']},
+  {era:'era-early-modern',name:'Никола Пуссен',years:'1594–1665',born:'Нормандия, Франция',style:'Классицизм',bio:'Отец французского классицизма. Работал в Риме, черпая вдохновение в античности и Рафаэле. Его «разумное искусство» стало академическим эталоном на два столетия.',works:['Аркадские пастухи','Похищение сабинянок (Пуссен)','Танец под музыку времени']},
+  {era:'era-early-modern',name:'Джованни Лоренцо Бернини',years:'1598–1680',born:'Неаполь, Италия',style:'Барокко',bio:'Творец римского барокко: архитектор, скульптор и художник в одном лице. Его мраморные скульптуры передают движение и страсть так, будто это живая плоть.',works:['Экстаз Святой Терезы','Аполлон и Дафна','Площадь Святого Петра']},
+  {era:'era-early-modern',name:'Жан-Антуан Ватто',years:'1684–1721',born:'Валансьен, Франция',style:'Рококо',bio:'Изобретатель жанра «галантных празднеств». Утончённые сцены с меланхоличными фигурами в пасторальных пейзажах определили эстетику рококо. Умер от туберкулёза в 36 лет.',works:['Паломничество на остров Киферу','Жиль','Вывеска Жерсена']},
+  {era:'era-early-modern',name:'Жан-Оноре Фрагонар',years:'1732–1806',born:'Грас, Франция',style:'Рококо',bio:'Последний великий мастер рококо. Лёгкие игривые сцены любви — воплощение беззаботного XVIII века. После Революции вышел из моды и умер в безвестности.',works:['Качели','Поцелуй украдкой','Читающая девушка']},
+  {era:'era-early-modern',name:'Жак-Луи Давид',years:'1748–1825',born:'Париж, Франция',style:'Неоклассицизм',bio:'Официальный живописец Французской революции и Наполеона. Строгий неоклассицизм на службе политической идеологии. «Клятва Горациев» стала манифестом гражданской добродетели.',works:['Клятва Горациев','Смерть Марата','Наполеон на перевале Сен-Бернар']},
+  {era:'era-early-modern',name:'Франсиско Гойя',years:'1746–1828',born:'Арагон, Испания',style:'Романтизм',bio:'От придворного живописца до пророка тёмных сторон человека. После потери слуха создал «Чёрные картины» — цикл мрачных видений, предвосхитивший экспрессионизм.',works:['Сатурн, пожирающий сына','Расстрел повстанцев 3 мая','Обнажённая Маха']},
+  {era:'era-xix',name:'Каспар Давид Фридрих',years:'1774–1840',born:'Грайфсвальд, Германия',style:'Романтизм',bio:'Главный художник немецкого романтизма. Одинокие фигуры перед бесконечными пейзажами — туманными горами, морем, зимними лесами — стали символом романтического мировоззрения.',works:['Странник над морем тумана','Морской берег в лунном свете','Меловые скалы Рюгена']},
+  {era:'era-xix',name:'Эжен Делакруа',years:'1798–1863',born:'Шарантон-Сен-Морис, Франция',style:'Романтизм',bio:'Лидер французского романтизма. Страстные, динамичные композиции с яркими контрастными цветами. «Свобода, ведущая народ» — политический манифест и шедевр одновременно.',works:['Свобода, ведущая народ','Резня на Хиосе','Охота на львов']},
+  {era:'era-xix',name:'Клод Моне',years:'1840–1926',born:'Париж, Франция',style:'Импрессионизм',bio:'Отец импрессионизма. Открыл, что свет важнее предмета. Серии «Руанский собор» и «Кувшинки» — исследования одного мотива в разное время суток и года.',works:['Impression, soleil levant','Руанский собор (серия)','Кувшинки (серия)']},
+  {era:'era-xix',name:'Пьер-Огюст Ренуар',years:'1841–1919',born:'Лимож, Франция',style:'Импрессионизм',bio:'Певец радости жизни. Портреты, ню, жанровые сцены — всё залито светом и оптимизмом. Несмотря на тяжёлый артрит в старости, работал до конца, привязав кисть к руке.',works:['Мулен де ла Галетт','Завтрак гребцов','Большие купальщицы']},
+  {era:'era-xix',name:'Илья Репин',years:'1844–1930',born:'Чугуев, Россия',style:'Реализм',bio:'Крупнейший русский реалист. Эпические многофигурные полотна, острые социальные сюжеты, психологически точные портреты. «Бурлаки на Волге» стали символом русского реализма.',works:['Бурлаки на Волге','Иван Грозный и его сын Иван','Крестный ход в Курской губернии']},
+  {era:'era-xix',name:'Винсент ван Гог',years:'1853–1890',born:'Зундерт, Нидерланды',style:'Постимпрессионизм',bio:'При жизни продал одну картину. Сегодня — один из самых дорогих художников мира. Экспрессивные мазки, невероятные цвета, страстная интенсивность — около 900 картин за 10 лет.',works:['Звёздная ночь','Подсолнухи','Ночная терраса кафе']},
+  {era:'era-xix',name:'Поль Сезанн',years:'1839–1906',born:'Экс-ан-Прованс, Франция',style:'Постимпрессионизм',bio:'«Отец современного искусства». Разложил форму на геометрические плоскости, открыв дорогу кубизму и абстракции. Яблоки Сезанна изменили живопись больше, чем любые другие фрукты в истории.',works:['Гора Сент-Виктуар (серия)','Игроки в карты','Большие купальщицы']},
+  {era:'era-xx-early',name:'Густав Климт',years:'1862–1918',born:'Вена, Австрия',style:'Модерн / Символизм',bio:'Лидер венского Сецессиона. Золотые орнаменты, чувственность и смерть — главные темы. «Поцелуй» — одна из самых воспроизводимых картин в мире.',works:['Поцелуй','Юдифь I','Портрет Адели Блох-Бауэр I']},
+  {era:'era-xix',name:'Эдвард Мунк',years:'1863–1944',born:'Лётен, Норвегия',style:'Символизм / Экспрессионизм',bio:'Художник экзистенциального ужаса. «Крик» — не просто картина, а диагноз современному человеку. Превратил личную травму в универсальный художественный язык.',works:['Крик','Мадонна','Меланхолия']},
+  {era:'era-xx-early',name:'Анри Матисс',years:'1869–1954',born:'Ле-Като-Камбрези, Франция',style:'Фовизм',bio:'Главный фовист и один из столпов модернизма. «Дикие цвета» фовизма сменились монументальным декоративизмом. В старости, прикованный к постели, создавал знаменитые бумажные аппликации.',works:['Танец','Радость жизни','Красная комната']},
+  {era:'era-xx-early',name:'Пабло Пикассо',years:'1881–1973',born:'Малага, Испания',style:'Кубизм',bio:'Самый влиятельный художник XX века. Изобрёл кубизм вместе с Жоржем Браком. «Герника» — главный антивоенный манифест в живописи. За 80 лет творчества создал около 20 000 произведений.',works:['Авиньонские девицы','Герника','Девочка на шаре']},
+  {era:'era-xx-early',name:'Василий Кандинский',years:'1866–1944',born:'Москва, Россия',style:'Абстракционизм',bio:'Создатель абстрактной живописи. Первая непредметная акварель — 1910 год. Разработал теорию об эмоциональном воздействии цвета и формы. Преподавал в Баухаусе.',works:['Импровизация 28','Композиция VIII','Жёлтое-Красное-Синее']},
+  {era:'era-xx-early',name:'Казимир Малевич',years:'1879–1935',born:'Киев, Украина',style:'Супрематизм',bio:'Создатель супрематизма — искусства чистой геометрии. «Чёрный квадрат» (1915) — нулевая точка живописи, радикальный разрыв со всей предшествующей традицией.',works:['Чёрный квадрат','Белое на белом','Супрематическая композиция']},
+  {era:'era-xx-early',name:'Марсель Дюшан',years:'1887–1968',born:'Нормандия, Франция',style:'Дадаизм',bio:'Провокатор, изменивший само определение искусства. Перевёрнутый писсуар с подписью («Фонтан») поставил вопрос: что делает объект произведением искусства? Каждый художник после Дюшана обязан на него ответить.',works:['Фонтан','Обнажённая, спускающаяся по лестнице','L.H.O.O.Q.']},
+  {era:'era-xx-mid',name:'Сальвадор Дали',years:'1904–1989',born:'Фигерес, Испания',style:'Сюрреализм',bio:'Виртуоз академического рисунка на службе бессознательного. Соединил технику старых мастеров с образами снов и параноидных видений. Был так же известен эпатажным поведением, как и картинами.',works:['Постоянство памяти','Сон','Искушение Святого Антония']},
+  {era:'era-xx-mid',name:'Марк Ротко',years:'1903–1970',born:'Двинск, Российская империя',style:'Абстрактный экспрессионизм',bio:'Создатель «живописи цветовых полей». Большие прямоугольники мерцающего цвета вызывают прямое эмоциональное переживание без посредников. «Мои картины — это трагедия и экстаз одновременно».',works:['Оранжевое и жёлтое','Четыре темноты на красном','Часовня Ротко']},
+  {era:'era-xx-mid',name:'Энди Уорхол',years:'1928–1987',born:'Питтсбург, США',style:'Поп-арт',bio:'Главный художник поп-арта. Превратил банки с супом и лицо Мэрилин Монро в иконы искусства. «В будущем каждый получит свои 15 минут славы». Основал «Фабрику» — легендарную творческую лабораторию.',works:['Банки с супом Кэмпбелл','Мэрилин Монро (диптих)','Электрический стул']},
+  {era:'era-xx-late',name:'Жан-Мишель Баскиа',years:'1960–1988',born:'Нью-Йорк, США',style:'Неоэкспрессионизм',bio:'Граффити-художник, ставший звездой арт-мира. Символы, слова, черепа — его живопись о расе, смерти и колониализме. Умер от передозировки в 27 лет.',works:['Без названия (Череп)','Самоубийца','Теги SAMO© (Нью-Йорк)']},
+];
+
+// ─── RENDER FUNCTIONS ─────────────────────────────────────────────────────────
+function renderStyles() {
+  const byEra = {};
+  STYLES.forEach(s=>{if(!byEra[s.era])byEra[s.era]=[];byEra[s.era].push(s);});
+  Object.entries(byEra).forEach(([eraId,styles])=>{
+    const container = document.getElementById(eraId);
+    if(!container)return;
+    container.innerHTML = '';
+    const chipRow = document.createElement('div');
+    chipRow.className='style-chip-row';
+    styles.forEach(s=>{
+      const chip=document.createElement('div');
+      chip.className='style-chip';chip.textContent=s.name;
+      chip.onclick=()=>togglePanel(chip);chipRow.appendChild(chip);
+    });
+    container.appendChild(chipRow);
+    styles.forEach(s=>container.insertAdjacentHTML('beforeend',buildPanel(s)));
+  });
+}
+
+function buildArtistPanel(artist) {
+  const idx = ARTISTS.indexOf(artist);
+  return `
+  <div class="style-panel" id="ap-${idx}">
+    <div class="style-panel-inner">
+      <div class="panel-name">${artist.name}</div>
+      <span class="panel-tag">${artist.years} · ${artist.born}</span>
+      <p class="panel-desc-short">${artist.bio}</p>
+      <div class="panel-disciplines">
+        <div class="panel-disc" style="border-bottom:none;padding-bottom:0;">
+          <div class="panel-disc-title">Главные работы</div>
+          <div class="panel-disc-row"><span class="panel-disc-val" style="grid-column:1/-1"><em>${artist.works.join(', ')}</em></span></div>
+        </div>
+      </div>
+      <button class="btn-more" style="margin-top:1rem;opacity:0.45;cursor:default;" title="Скоро">Страница художника
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h8M7 3l3 3-3 3"/></svg>
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderArtists() {
+  document.querySelectorAll('.century-content').forEach(el=>el.innerHTML='');
+  const byEra = {};
+  ARTISTS.forEach(a=>{if(!byEra[a.era])byEra[a.era]=[];byEra[a.era].push(a);});
+  Object.entries(byEra).forEach(([eraId,artists])=>{
+    const container = document.getElementById(eraId);
+    if(!container)return;
+    const chipRow = document.createElement('div');
+    chipRow.className='style-chip-row';
+    artists.forEach(a=>{
+      const chip=document.createElement('div');
+      chip.className='style-chip';chip.textContent=a.name;
+      chip.onclick=()=>togglePanel(chip);chipRow.appendChild(chip);
+    });
+    container.appendChild(chipRow);
+    artists.forEach(a=>container.insertAdjacentHTML('beforeend',buildArtistPanel(a)));
+  });
+}
+
+function switchView(view, el) {
+  document.querySelectorAll('#nav-list-links .nav-chip').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(view==='styles') renderStyles();
+  else if(view==='artists') renderArtists();
+}
+
+renderStyles();
+
+function togglePanel(chip) {
+  const row=chip.parentElement;const container=row.parentElement;
+  const chips=Array.from(row.querySelectorAll('.style-chip'));
+  const panels=Array.from(container.querySelectorAll('.style-panel'));
+  const idx=chips.indexOf(chip);const panel=panels[idx];
+  const isOpen=panel.classList.contains('open');
+  panels.forEach(p=>p.classList.remove('open'));chips.forEach(c=>c.classList.remove('active'));
+  if(!isOpen){panel.classList.add('open');chip.classList.add('active');}
+}
+
+// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
+function lbOpen(idx) {
+  lbIndex = idx;
+  lbRender();
+  document.getElementById('lb-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function lbClose() {
+  document.getElementById('lb-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function lbNav(delta) {
+  lbIndex = (lbIndex + delta + lbWorks.length) % lbWorks.length;
+  lbRender();
+}
+function lbRender() {
+  const w = lbWorks[lbIndex];
+  const img = document.getElementById('lb-img');
+  img.classList.add('fade');
+  img.src = w.imgUrl;
+  img.alt = w.name;
+  img.onload = img.onerror = () => img.classList.remove('fade');
+  document.getElementById('lb-name').textContent = w.name;
+  document.getElementById('lb-meta').textContent = w.author + ', ' + w.year;
+  document.getElementById('lb-count').textContent = (lbIndex + 1) + ' / ' + lbWorks.length;
+  document.getElementById('lb-prev').disabled = lbWorks.length <= 1;
+  document.getElementById('lb-next').disabled = lbWorks.length <= 1;
+}
+document.getElementById('lb-overlay').addEventListener('click', e => { if (e.target.id === 'lb-overlay') lbClose(); });
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lb-overlay').classList.contains('open')) return;
+  if (e.key === 'ArrowLeft') lbNav(-1);
+  else if (e.key === 'ArrowRight') lbNav(1);
+  else if (e.key === 'Escape') lbClose();
+});
+
+const blocks=document.querySelectorAll('.century-block');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:0.05});
+blocks.forEach(b=>obs.observe(b));
+</script>
+</body>
+</html>
